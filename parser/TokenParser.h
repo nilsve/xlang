@@ -23,12 +23,14 @@ private:
     static wchar_t getStringLiteral(wchar_t chr);
 public:
     TokenParser(const std::wstring& code) : code(code) {}
-    const Token getToken();
-    Token peekToken();
+    const Token getToken(bool allowStringLiteral = true);
+    Token peekToken(bool allowStringLiteral = true);
 
     void throwError(std::wstring message) const;
 
     void throwError(std::string message) const;
+
+    void eatToken();
 };
 
 

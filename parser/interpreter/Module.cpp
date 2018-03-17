@@ -3,6 +3,7 @@
 //
 
 #include "Module.h"
+#include "Function.h"
 
 #include <memory>
 
@@ -18,18 +19,26 @@ void Module::Parse(TokenParser& parser) {
     this->moduleName = moduleName.token;
 
     while(true) {
-        auto token = parser.getToken();
+        auto token = parser.getToken(false);
 
         if (token.token == L"function") {
             parseFunction(parser);
+        } else if (Variable::isVariableType(token.token)) {
+            parseVariable(parser, token);
         } else {
             return parser.throwError(L"Unexpected token " + token.token);
         }
     }
 }
 
+void Module::parseVariable(TokenParser& parser, const Token& dataType) {
+    auto variable = make_shared<Variable>(dataType.token);
+    variable->Parse(parser);
+    variables.push_back(variable);
+}
+
 void Module::parseFunction(TokenParser& parser) {
-    shared_ptr<Module> module = make_shared<Module>();
-    module->Parse(parser);
-    modules.push_back(module);
+    auto function = make_shared<Function>();
+    function->Parse(parser);
+    functions.push_back(function);
 }

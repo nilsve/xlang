@@ -17,6 +17,7 @@ class Parser : public non_copyable {
 private:
     std::vector<std::shared_ptr<CodeFile>> codeFiles;
     std::vector<std::shared_ptr<Module>> modules;
+
     std::shared_ptr<CodeFile> mainFile;
 
     void parseModule(TokenParser &parser);
@@ -28,8 +29,6 @@ public:
     void Parse();
 
     std::shared_ptr<CodeFile> loadFile(const std::wstring& filePath);
-
-    void validateRootToken(const TokenParser& parser, Token& token);
 };
 
 

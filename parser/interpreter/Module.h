@@ -7,14 +7,21 @@
 
 #include <string>
 #include "../TokenParser.h"
+#include "Function.h"
+#include "Variable.h"
+#include <vector>
 
-class Module {
+class Module : public non_copyable  {
 private:
     std::wstring moduleName;
+    std::vector<std::shared_ptr<Function>> functions;
+    std::vector<std::shared_ptr<Variable>> variables;
 
     void parseFunction(TokenParser &parser);
+    void parseVariable(TokenParser &parser, const Token& dataType);
 public:
     void Parse(TokenParser& parser);
+
 };
 
 

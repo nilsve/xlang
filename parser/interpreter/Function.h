@@ -7,12 +7,14 @@
 
 
 #include "../TokenParser.h"
+#include "Variable.h"
 
-class Function {
+class Function : public non_copyable  {
 private:
     std::wstring functionName;
+
+    Variable returnVariable;
 public:
-    Function(const std::wstring& functionName) : functionName(functionName) {}
     void Parse(TokenParser& parser);
 };
 

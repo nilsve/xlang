@@ -26,7 +26,7 @@ void Parser::Parse() {
     TokenParser parser(mainFile->getCode());
 
     while(true) {
-        auto token = parser.getToken();
+        auto token = parser.getToken(false);
 
         if (token.token == L"module") {
             parseModule(parser);
@@ -40,12 +40,6 @@ void Parser::parseModule(TokenParser& parser) {
     shared_ptr<Module> module = make_shared<Module>();
     module->Parse(parser);
     modules.push_back(module);
-}
-
-void Parser::validateRootToken(const TokenParser& parser, Token& token) {
-    if (token.isStringLiteral) {
-        parser.throwError("Unexpected string literal!");
-    }
 }
 
 std::shared_ptr<CodeFile> Parser::loadFile(const std::wstring& filePath) {

@@ -8,31 +8,47 @@
 
 using namespace std;
 
-Token TokenParser::peekToken() {
+Token TokenParser::peekToken(bool allowStringLiteral) {
     auto oldPosition = position;
     auto token = getToken();
     position = oldPosition;
     return token;
 }
 
-bool TokenParser::isWhitespace(wchar_t chr) {
-    return chr == L' ' || chr == L'\t';
+void TokenParser::eatToken() {
+    getToken();
 }
 
-const Token TokenParser::getToken() {
+bool TokenParser::isWhitespace(wchar_t chr) {
+    return chr == L' ' || chr == L'\t' || chr == L'\n' || chr == L'\r';
+}
+
+const Token TokenParser::getToken(bool allowStringLiteral) {
     Token token;
     token.position = position;
 
     wchar_t stringLiteral = 0;
 
     for (; position < code.length(); position++) {
-        const char chr = code[position];
+        const wchar_t chr = code[position];
         if (stringLiteral || !isWhitespace(chr)) {
 
             if (!stringLiteral && getStringLiteral(chr)) {
                 // Begin string literal
+
+                if (!allowStringLiteral) {
+                    throwError("Unexpected string literal!");
+                }
+
                 token.isStringLiteral = stringLiteral = chr;
                 continue;
+            } else if (!stringLiteral && token.token.length() > 0) {
+                // Check for special characters
+
+                if (!((chr >= L'a' && chr <= L'z') || (chr >= L'A' && chr <= L'Z') || (chr >= 0 && chr <= L'9'))) {
+                    break;
+                }
+
             } else  if (stringLiteral != 0) {
                 if (stringLiteral == chr) {
                     // Einde string literal
