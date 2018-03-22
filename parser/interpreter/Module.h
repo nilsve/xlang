@@ -22,6 +22,9 @@ private:
 public:
     void Parse(TokenParser& parser);
 
+    std::wstring getModuleName() const;
+    const std::vector<std::shared_ptr<Function>>& getFunctions() const;
+    const std::vector<std::shared_ptr<Variable>>& getVariables() const;
 };
 
 

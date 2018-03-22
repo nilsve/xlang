@@ -14,7 +14,7 @@ class Variable : public non_copyable {
 private:
     const std::wstring dataType;
     const bool isFunctionArgument;
-    std::wstring name;
+    std::wstring variableName;
 
     bool isPointer = false;
     bool isArray = false;
@@ -22,11 +22,13 @@ private:
 
     bool validateVariable(std::string& result);
 public:
-    Variable(const std::wstring& dataType, bool isFunctionArgument) : dataType(dataType), isFunctionArgument(isFunctionArgument) {}
+    Variable(const std::wstring& dataType, bool isFunctionArgument = false) : dataType(dataType), isFunctionArgument(isFunctionArgument) {}
 
     void Parse(TokenParser& parser);
 
-    static bool isVariableType(const std::wstring& token);
+    static bool isVariableType(const Token& token);
+
+    static std::unique_ptr<Variable> parseFunctionArg(TokenParser &parser);
 };
 
 

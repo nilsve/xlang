@@ -20,7 +20,7 @@ void CodeFile::resolveImports() {
         const Token token = parser.getToken();
 
         if (!token.isStringLiteral) {
-            if (token.token == L"#import") {
+            if (token == L"#import") {
                 const Token fileToken = parser.getToken();
                 if (!fileToken.isStringLiteral) {
                     parser.throwError("Expected a string literal after #include");
@@ -32,7 +32,7 @@ void CodeFile::resolveImports() {
             }
         }
 
-        if (token.token == L"") {
+        if (token == L"") {
             break;
         }
     }

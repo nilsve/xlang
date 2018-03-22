@@ -10,26 +10,36 @@
 
 using namespace std;
 
-bool Variable::isVariableType(const std::wstring &token, bool isFunctionArgument) {
+bool Variable::isVariableType(const Token& token) {
     static set<wstring> dataTypes = {
         L"char",
         L"int"
     };
 
-    return dataTypes.find(token) != dataTypes.end();
+    return dataTypes.find(token.token) != dataTypes.end();
 }
 
 void Variable::Parse(TokenParser &parser) {
     auto token = parser.getToken(false);
 
-    if (token.token == L"[") {
+    if (token == L"[") {
+
+        if (isFunctionArgument) {
+            parser.throwError("Function argument can't be an array!");
+        }
+
         isArray = true;
 
         token = parser.getToken(false);
 
-        if (token.token == L"]") {
+        if (token == L"]") {
             // Array of yet unknown length
         } else {
+
+            if (isFunctionArgument) {
+                parser.throwError(L"Function argument of type array can't have fixed size!");
+            }
+
             std::wstringstream ss(token.token);
             if ((ss >> arrayLength).fail() || !(ss >> std::ws).eof())
             {
@@ -37,28 +47,29 @@ void Variable::Parse(TokenParser &parser) {
             }
 
             token = parser.getToken(false);
-            if (token.token != L"]") {
+            if (token != L"]") {
                 parser.throwError("Expected ] character");
             }
         }
+
+        // Variable name
+        token = parser.getToken(false);
     }
 
-    // Variable name
-    token = parser.getToken(false);
-    name = token.token;
+    variableName = token.token;
 
     if (!isFunctionArgument) {
         // Function arguments can't have default values TODO
 
         token = parser.peekToken(false);
 
-        if (token.token == L"=") {
+        if (token == L"=") {
             parser.eatToken(); // Remove previously peeked token
 
-            // Directly initalize
+            // Directly initialize
             token = parser.getToken();
 
-
+            //FIXME
         }
     }
 
@@ -75,4 +86,11 @@ bool Variable::validateVariable(std::string& result) {
     }
 
     return false;
+}
+
+std::unique_ptr<Variable> Variable::parseFunctionArg(TokenParser &parser) {
+    auto token = parser.getToken(false);
+    auto result = make_unique<Variable>(token.token, true);
+    result->Parse(parser);
+    return result;
 }

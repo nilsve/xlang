@@ -8,14 +8,39 @@
 
 #include "../TokenParser.h"
 #include "Variable.h"
+#include "Scope.h"
+
+#include <memory>
+#include <vector>
+
+enum class CallingConvention {
+    cdecl,
+    stdcall,
+    unknown,
+};
 
 class Function : public non_copyable  {
 private:
     std::wstring functionName;
+    CallingConvention callingConvention;
 
-    Variable returnVariable;
+    std::vector<std::shared_ptr<Variable>> parameters;
+    std::unique_ptr<Variable> returnVariable;
+
+    std::shared_ptr<Scope> rootScope;
+
+    void parseHeader(TokenParser& parser);
+    void parseBody(TokenParser& parser);
+
+    static CallingConvention getCallingConvention(const std::wstring& convention);
 public:
     void Parse(TokenParser& parser);
+
+    const std::wstring &getFunctionName() const;
+    CallingConvention getCallingConvention() const;
+    const std::vector<std::shared_ptr<Variable>> &getParameters() const;
+    const std::unique_ptr<Variable> &getReturnVariable() const;
+    const std::shared_ptr<Scope> &getRootScope() const;
 };
 
 

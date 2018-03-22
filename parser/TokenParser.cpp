@@ -10,7 +10,7 @@ using namespace std;
 
 Token TokenParser::peekToken(bool allowStringLiteral) {
     auto oldPosition = position;
-    auto token = getToken();
+    auto token = getToken(allowStringLiteral);
     position = oldPosition;
     return token;
 }
@@ -45,7 +45,7 @@ const Token TokenParser::getToken(bool allowStringLiteral) {
             } else if (!stringLiteral && token.token.length() > 0) {
                 // Check for special characters
 
-                if (!((chr >= L'a' && chr <= L'z') || (chr >= L'A' && chr <= L'Z') || (chr >= 0 && chr <= L'9'))) {
+                if (isSpecialChar(chr)) {
                     break;
                 }
 
@@ -58,6 +58,10 @@ const Token TokenParser::getToken(bool allowStringLiteral) {
                     // Fout!
                     throw new exception();
                 }
+            } else if (isSpecialChar(chr)) {
+                position++;
+                token.token += chr;
+                break;
             }
 
             token.token += chr;
@@ -69,6 +73,10 @@ const Token TokenParser::getToken(bool allowStringLiteral) {
     }
 
     return token;
+}
+
+bool TokenParser::isSpecialChar(wchar_t chr) {
+    return !((chr >= L'a' && chr <= L'z') || (chr >= L'A' && chr <= L'Z') || (chr >= L'0' && chr <= L'9'));
 }
 
 wchar_t TokenParser::getStringLiteral(wchar_t chr) {
@@ -85,4 +93,12 @@ void TokenParser::throwError(std::wstring message) const {
 
 void TokenParser::throwError(std::string message) const {
     throw std::invalid_argument(message.c_str());
+}
+
+bool Token::operator==(const std::wstring &other) const {
+    return this->token == other;
+}
+
+bool Token::operator!=(const std::wstring &other) const {
+    return this->token != other;
 }

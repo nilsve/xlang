@@ -21,9 +21,11 @@ void Module::Parse(TokenParser& parser) {
     while(true) {
         auto token = parser.getToken(false);
 
-        if (token.token == L"function") {
+        if (token == L"") {
+            break;
+        } else if (token == L"function") {
             parseFunction(parser);
-        } else if (Variable::isVariableType(token.token)) {
+        } else if (Variable::isVariableType(token)) {
             parseVariable(parser, token);
         } else {
             return parser.throwError(L"Unexpected token " + token.token);
@@ -41,4 +43,16 @@ void Module::parseFunction(TokenParser& parser) {
     auto function = make_shared<Function>();
     function->Parse(parser);
     functions.push_back(function);
+}
+
+std::wstring Module::getModuleName() const {
+    return moduleName;
+}
+
+const std::vector<std::shared_ptr<Function>> &Module::getFunctions() const {
+    return functions;
+}
+
+const std::vector<std::shared_ptr<Variable>> &Module::getVariables() const {
+    return variables;
 }

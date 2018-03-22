@@ -15,6 +15,8 @@
 
 class Parser : public non_copyable {
 private:
+    bool parsed = false;
+
     std::vector<std::shared_ptr<CodeFile>> codeFiles;
     std::vector<std::shared_ptr<Module>> modules;
 
@@ -29,6 +31,8 @@ public:
     void Parse();
 
     std::shared_ptr<CodeFile> loadFile(const std::wstring& filePath);
+
+    const std::vector<std::shared_ptr<Module>>& getModules() const;
 };
 
 
