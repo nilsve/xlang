@@ -22,6 +22,7 @@ private:
 
     bool validateVariable(std::string& result);
 public:
+    Variable() : isFunctionArgument(false) {}
     Variable(const std::wstring& dataType, bool isFunctionArgument = false) : dataType(dataType), isFunctionArgument(isFunctionArgument) {}
 
     void Parse(TokenParser& parser);
@@ -29,6 +30,8 @@ public:
     static bool isVariableType(const Token& token);
 
     static std::unique_ptr<Variable> parseFunctionArg(TokenParser &parser);
+
+    const std::wstring &getVariableName() const;
 };
 
 

@@ -79,6 +79,10 @@ void Variable::Parse(TokenParser &parser) {
     }
 }
 
+const wstring &Variable::getVariableName() const {
+    return variableName;
+}
+
 bool Variable::validateVariable(std::string& result) {
     if (isArray && arrayLength == 0) {
         result = "Array length can't be 0";
