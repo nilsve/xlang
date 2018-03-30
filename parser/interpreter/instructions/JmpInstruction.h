@@ -13,8 +13,9 @@ class JmpInstruction : public Instruction {
 private:
     Instruction* targetScope;
 public:
-    JmpInstruction(Instruction* _targetScope) : targetScope(_targetScope) {}
-    void Assemble();
+    explicit JmpInstruction(Instruction* _targetScope) : targetScope(_targetScope) {}
+
+    void Assemble() override;
 };
 
 

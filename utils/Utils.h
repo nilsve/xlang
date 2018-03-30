@@ -9,7 +9,7 @@
 
 class Utils {
 private:
-    Utils();
+    Utils() = default;
 public:
     static std::wstring readFile(const std::wstring& fileName);
 

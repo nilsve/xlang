@@ -5,8 +5,6 @@
 #include "Scope.h"
 #include "instructions/CallInstruction.h"
 
-#include <string>
-
 using namespace std;
 
 

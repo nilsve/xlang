@@ -19,7 +19,7 @@ private:
     std::vector<const Variable*> parameters;
 
 public:
-    CallInstruction(std::wstring _targetFunction, std::vector<const Variable*> _parameters) : targetFunction(_targetFunction), parameters(_parameters) {}
+    CallInstruction(std::wstring _targetFunction, std::vector<const Variable*> _parameters) : targetFunction(std::move(_targetFunction)), parameters(std::move(_parameters)) {}
 };
 
 

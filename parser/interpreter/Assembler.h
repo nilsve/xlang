@@ -30,7 +30,7 @@ private:
     void assembleModule(const Module& module);
     void assembleFunction(const Function& function);
 public:
-    Assembler(const Parser& _parser);
+    explicit Assembler(const Parser& _parser);
     void Assemble();
 
     void throwError(std::wstring message) const;

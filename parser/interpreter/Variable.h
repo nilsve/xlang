@@ -23,7 +23,7 @@ private:
     bool validateVariable(std::string& result);
 public:
     Variable() : isFunctionArgument(false) {}
-    Variable(const std::wstring& dataType, bool isFunctionArgument = false) : dataType(dataType), isFunctionArgument(isFunctionArgument) {}
+    explicit Variable(std::wstring dataType, bool isFunctionArgument = false) : dataType(std::move(dataType)), isFunctionArgument(isFunctionArgument) {}
 
     void Parse(TokenParser& parser);
 

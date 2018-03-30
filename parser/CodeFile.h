@@ -16,7 +16,7 @@ private:
     const std::wstring relativePath;
     std::wstring code;
     void resolveImports();
-    std::wstring resolvePath(const std::wstring relativePath);
+    std::wstring resolvePath(std::wstring relativePath);
 public:
     CodeFile(std::wstring relativePath, Parser& parser);
     const std::wstring& getCode();

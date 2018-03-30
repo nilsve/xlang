@@ -27,7 +27,7 @@ private:
     static wchar_t getStringLiteral(wchar_t chr);
     static bool isSpecialChar(wchar_t chr);
 public:
-    TokenParser(const std::wstring& code) : code(code) {}
+    explicit TokenParser(const std::wstring& code) : code(code) {}
     const Token getToken(bool allowStringLiteral = true);
     Token peekToken(bool allowStringLiteral = true);
 

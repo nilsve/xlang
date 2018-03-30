@@ -9,7 +9,7 @@
 
 #include <string>
 #include <exception>
-#include <assert.h>
+#include <cassert>
 
 using namespace std;
 

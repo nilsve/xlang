@@ -2,7 +2,7 @@
 #include "parser/CodeFile.h"
 #include "parser/Parser.h"
 #include "parser/interpreter/Assembler.h"
-#include <time.h>
+#include <ctime>
 
 int main() {
 

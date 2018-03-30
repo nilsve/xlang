@@ -56,7 +56,7 @@ const Token TokenParser::getToken(bool allowStringLiteral) {
                     break;
                 } else if (chr == '\n') {
                     // Fout!
-                    throw new exception();
+                    throwError("Unexpected newline in string literal!");
                 }
             } else if (isSpecialChar(chr)) {
                 position++;
