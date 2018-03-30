@@ -10,22 +10,17 @@
 using namespace std;
 
 void Assembler::Assemble() {
-    auto modules = parser.getModules();
+    const auto& modules = parser.getModules();
 
     assembleModules(modules);
 
-    if (auto module = findModule(modules, L"main").lock()) {
-        if (auto function = findFunction(*module, L"main").lock()) {
-
-        } else {
-            throwError("Function 'main' not found in module 'main'!");
-        }
-    } else {
-        throwError("Module 'main' not found!");
+    if (auto module = findModule(modules, L"main")) {
+        auto function = findFunction(*module, L"main");
     }
+
 }
 
-void Assembler::assembleModules(std::vector<std::shared_ptr<Module>>& modules) {
+void Assembler::assembleModules(const std::vector<std::unique_ptr<Module>>& modules) {
     for (auto& module : modules) {
         assembleModule(*module);
     }
@@ -48,24 +43,24 @@ void Assembler::assembleScope(const Scope& scope) {
 
 }
 
-std::weak_ptr<Module> Assembler::findModule(std::vector<std::shared_ptr<Module>>& modules, std::wstring moduleName) {
-    for (auto module : modules) {
+const Module* Assembler::findModule(const std::vector<std::unique_ptr<Module>>& modules, std::wstring moduleName) const {
+    for (auto& module : modules) {
         if (module->getModuleName() == moduleName) {
-            return module;
+            return module.get();
         }
     }
 
-    return weak_ptr<Module>();
+    return nullptr;
 }
 
-std::weak_ptr<Function> Assembler::findFunction(const Module &module, std::wstring functionName) {
-    for (auto function : module.getFunctions()) {
+const Function* Assembler::findFunction(const Module &module, std::wstring functionName) const {
+    for (auto& function : module.getFunctions()) {
         if (function->getFunctionName() == functionName) {
-            return function;
+            return function.get();
         }
     }
 
-    return weak_ptr<Function>();
+    return nullptr;
 }
 
 void Assembler::throwError(std::wstring message) const {

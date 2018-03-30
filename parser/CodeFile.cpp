@@ -26,8 +26,8 @@ void CodeFile::resolveImports() {
                     parser.throwError("Expected a string literal after #include");
                 } else {
                     // Fix import
-                    auto codeFile = this->parser.loadFile(fileToken.token);
-                    code.replace(token.position, fileToken.position + fileToken.token.length() + 2, codeFile->code);
+                    auto& codeFile = this->parser.loadFile(fileToken.token);
+                    code.replace(token.position, fileToken.position + fileToken.token.length() + 2, codeFile.code);
                 }
             }
         }

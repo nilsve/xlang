@@ -17,10 +17,10 @@ class Parser : public non_copyable {
 private:
     bool parsed = false;
 
-    std::vector<std::shared_ptr<CodeFile>> codeFiles;
-    std::vector<std::shared_ptr<Module>> modules;
+    std::vector<std::unique_ptr<CodeFile>> codeFiles;
+    std::vector<std::unique_ptr<Module>> modules;
 
-    std::shared_ptr<CodeFile> mainFile;
+    CodeFile* mainFile;
 
     void parseModule(TokenParser &parser);
 
@@ -30,9 +30,9 @@ public:
     Parser(const std::wstring& workspace, const std::wstring& mainFilePath);
     void Parse();
 
-    std::shared_ptr<CodeFile> loadFile(const std::wstring& filePath);
+    CodeFile& loadFile(const std::wstring& filePath);
 
-    const std::vector<std::shared_ptr<Module>>& getModules() const;
+    const std::vector<std::unique_ptr<Module>>& getModules() const;
 };
 
 

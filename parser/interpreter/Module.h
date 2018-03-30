@@ -14,8 +14,8 @@
 class Module : public non_copyable  {
 private:
     std::wstring moduleName;
-    std::vector<std::shared_ptr<Function>> functions;
-    std::vector<std::shared_ptr<Variable>> variables;
+    std::vector<std::unique_ptr<Function>> functions;
+    std::vector<std::unique_ptr<Variable>> variables;
 
     void parseFunction(TokenParser &parser);
     void parseVariable(TokenParser &parser, const Token& dataType);
@@ -23,8 +23,8 @@ public:
     void Parse(TokenParser& parser);
 
     std::wstring getModuleName() const;
-    const std::vector<std::shared_ptr<Function>>& getFunctions() const;
-    const std::vector<std::shared_ptr<Variable>>& getVariables() const;
+    const std::vector<std::unique_ptr<Function>>& getFunctions() const;
+    const std::vector<std::unique_ptr<Variable>>& getVariables() const;
 };
 
 

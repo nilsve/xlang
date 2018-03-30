@@ -14,8 +14,8 @@
 using namespace std;
 
 Parser::Parser(const std::wstring& workspace, const std::wstring& mainFilePath) : workspace(workspace) {
-    auto codeFile = loadFile(mainFilePath);
-    mainFile = codeFile;
+    auto& codeFile = loadFile(mainFilePath);
+    mainFile = &codeFile;
     mainFile->Load();
 }
 
@@ -38,20 +38,21 @@ void Parser::Parse() {
     parsed = true;
 }
 
+
+
 void Parser::parseModule(TokenParser& parser) {
-    shared_ptr<Module> module = make_shared<Module>();
+    auto module = make_unique<Module>();
     module->Parse(parser);
-    modules.push_back(module);
+    modules.push_back(std::move(module));
 }
 
-std::shared_ptr<CodeFile> Parser::loadFile(const std::wstring& filePath) {
-    auto codeFile = std::make_shared<CodeFile>(filePath, *this);
-    codeFiles.push_back(codeFile);
-    codeFile->Load();
-    return codeFile;
+CodeFile& Parser::loadFile(const std::wstring& filePath) {
+    codeFiles.push_back(std::make_unique<CodeFile>(filePath, *this));
+    auto& codeFile = codeFiles.back();
+    return *codeFile;
 }
 
-const std::vector<std::shared_ptr<Module>>& Parser::getModules() const {
+const std::vector<std::unique_ptr<Module>>& Parser::getModules() const {
     assert(parsed); // Code not parsed yet!
 
     return modules;

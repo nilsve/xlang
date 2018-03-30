@@ -21,12 +21,12 @@ private:
 
     size_t appendOutput(std::vector<unsigned char> instructions);
 
-    std::weak_ptr<Module> findModule(std::vector<std::shared_ptr<Module>>& modules, std::wstring moduleName);
-    std::weak_ptr<Function> findFunction(const Module& module, std::wstring functionName);
+    const Module* findModule(const std::vector<std::unique_ptr<Module>>& modules, std::wstring moduleName) const;
+    const Function* findFunction(const Module& module, std::wstring functionName) const;
 
     std::map<std::wstring, unsigned long> functionMap; // string = modulename.functionname, unsigned long = relative address
 
-    void assembleModules(std::vector<std::shared_ptr<Module>>& modules);
+    void assembleModules(const std::vector<std::unique_ptr<Module>>& modules);
     void assembleModule(const Module& module);
     void assembleFunction(const Function& function);
 public:
