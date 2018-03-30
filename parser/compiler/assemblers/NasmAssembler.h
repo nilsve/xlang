@@ -5,12 +5,14 @@
 #ifndef XLANG_NASMASSEMBLER_H
 #define XLANG_NASMASSEMBLER_H
 
-
 #include "AssemblerBase.h"
+#include "../../interpreter/Function.h"
+#include "../../interpreter/Module.h"
 
 class NasmAssembler : public AssemblerBase {
 public:
-    void assembleInstruction();
+    std::wstring assembleInstruction(const Instruction &instruction) const override;
+    std::wstring assembleFunctionEnd() const override;
 };
 
 

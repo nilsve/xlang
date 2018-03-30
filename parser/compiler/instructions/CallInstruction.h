@@ -14,11 +14,14 @@
 
 class CallInstruction : public Instruction {
 private:
-    std::wstring targetFunction;
+    std::wstring target;
     std::vector<const Variable*> parameters;
 
 public:
-    CallInstruction(std::wstring _targetFunction, std::vector<const Variable*> _parameters) : targetFunction(std::move(_targetFunction)), parameters(std::move(_parameters)) {}
+    CallInstruction(std::wstring _target, std::vector<const Variable*> _parameters) : target(std::move(_target)), parameters(std::move(_parameters)) {}
+    CallInstruction(std::wstring _target) : target(std::move(_target)) {}
+
+    const std::wstring& getTarget() const {return target;}
 };
 
 

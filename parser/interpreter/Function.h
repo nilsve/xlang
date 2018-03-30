@@ -19,8 +19,12 @@ enum class CallingConvention {
     unknown,
 };
 
+class Module;
+
 class Function : public non_copyable  {
 private:
+    const Module* parent = nullptr;
+
     std::wstring functionName;
     CallingConvention callingConvention;
 
@@ -34,9 +38,13 @@ private:
 
     static CallingConvention getCallingConvention(const std::wstring& convention);
 public:
+    Function(const Module* _parent) : parent(_parent) {}
     void Parse(TokenParser& parser);
 
     const std::wstring &getFunctionName() const;
+
+    const Module *getParent() const;
+
     CallingConvention getCallingConvention() const;
     const std::vector<std::unique_ptr<Variable>> &getParameters() const;
     const std::unique_ptr<Variable> &getReturnVariable() const;

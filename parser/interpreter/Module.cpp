@@ -40,7 +40,7 @@ void Module::parseVariable(TokenParser& parser, const Token& dataType) {
 }
 
 void Module::parseFunction(TokenParser& parser) {
-    auto function = make_unique<Function>();
+    auto function = make_unique<Function>(this);
     function->Parse(parser);
     functions.push_back(std::move(function));
 }

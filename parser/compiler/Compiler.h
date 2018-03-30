@@ -15,15 +15,16 @@
 #include <map>
 
 template <typename Assembler>
-class Compiler : public Assembler, public non_copyable {
-    static_assert(std::is_base_of<AssemblerBase, Assembler>::value);
-
+class Compiler : public non_copyable {
+    static_assert(std::is_base_of<AssemblerBase, Assembler>::value, "Assembler has to be derrived from AssemblerBase");
 private:
     const Parser& parser;
 
+    Assembler assembler;
+
     std::wstring output;
 
-    const Module* findModule(const std::vector<std::unique_ptr<Module>>& modules, std::wstring moduleName) const {
+    inline const Module* findModule(const std::vector<std::unique_ptr<Module>>& modules, std::wstring moduleName) const {
         for (auto& module : modules) {
             if (module->getModuleName() == moduleName) {
                 return module.get();
@@ -32,7 +33,7 @@ private:
 
         return nullptr;
     }
-    const Function* findFunction(const Module& module, std::wstring functionName) const {
+    inline const Function* findFunction(const Module& module, std::wstring functionName) const {
         for (auto& function : module.getFunctions()) {
             if (function->getFunctionName() == functionName) {
                 return function.get();
@@ -42,40 +43,29 @@ private:
         return nullptr;
     }
 
-    void compileModules(const std::vector<std::unique_ptr<Module>> &modules) {
+    inline void compileModules(const std::vector<std::unique_ptr<Module>> &modules) {
         for (auto& module : modules) {
-            compileModule(*module);
+            for (auto& function : module->getFunctions()) {
+                appendOutput(assembler.assembleFunctionStart(*function));
+
+                compileScope(*function->getRootScope());
+
+                appendOutput(assembler.assembleFunctionEnd());
+            }
         }
     }
-    void compileModule(const Module &module) {
-        appendOutput(L"");
 
-        for (auto& function : module.getFunctions()) {
-            compileFunction(*function);
-        }
-    }
-    void compileFunction(const Function &function) {
-        compileScope(*function.getRootScope());
-    }
-
-    void throwError(std::wstring message) const {
-        return throwError(Utils::wstring_to_utf8(message));
-    }
-    void throwError(std::string message) const {
-        throw std::invalid_argument(message.c_str());
-    }
-
-    void compileScope(const Scope &scope) {
+    inline void compileScope(const Scope &scope) {
+        appendOutput(assembler.assembleScopeStart(scope));
         auto& instructions = scope.getInstructions();
 
         for (auto& instruction : instructions) {
-            assembleInstruction(instruction);
+            appendOutput(assembler.assembleInstruction(*instruction));
         }
     }
 
-    void assembleInstruction(const std::unique_ptr<Instruction> &instruction);
     void appendOutput(std::wstring line) {
-        output += line;
+        output += line + L"\n";
     }
 
 public:
@@ -83,7 +73,7 @@ public:
         output.reserve(2048);
     }
 
-    void Compile() {
+    std::wstring Compile() {
         const auto& modules = parser.getModules();
 
         compileModules(modules);
@@ -93,6 +83,8 @@ public:
 
             }
         }
+
+        return std::move(output);
     }
 };
 

@@ -67,7 +67,7 @@ void Function::parseHeader(TokenParser& parser) {
 }
 
 void Function::parseBody(TokenParser& parser) {
-    rootScope = make_unique<Scope>();
+    rootScope = make_unique<Scope>(this);
     rootScope->Parse(parser);
 }
 
@@ -99,4 +99,8 @@ const unique_ptr<Variable> &Function::getReturnVariable() const {
 
 const unique_ptr<Scope> &Function::getRootScope() const {
     return rootScope;
+}
+
+const Module *Function::getParent() const {
+    return parent;
 }

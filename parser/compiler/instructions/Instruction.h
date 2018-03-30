@@ -9,6 +9,8 @@
 #include "../../../utils/non_copyable.h"
 
 class Instruction : public non_copyable {
+public:
+    virtual ~Instruction() = default;
 };
 
 

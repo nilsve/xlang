@@ -3,7 +3,19 @@
 //
 
 #include "NasmAssembler.h"
+#include "../instructions/CallInstruction.h"
+#include "../../interpreter/Module.h"
 
-void NasmAssembler::assembleInstruction() {
+#include <iostream>
 
+std::wstring NasmAssembler::assembleInstruction(const Instruction& instruction) const {
+    if (auto callInstruction = dynamic_cast<const CallInstruction*>(&instruction)) {
+        return L"call " + callInstruction->getTarget();
+    }
+
+    throw std::invalid_argument("Instruction not implemented!");
+}
+
+std::wstring NasmAssembler::assembleFunctionEnd() const {
+    return L"ret";
 }

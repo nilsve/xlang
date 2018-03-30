@@ -37,11 +37,21 @@ std::wstring Utils::utf8_to_wstring (const std::string& str)
     return myconv.from_bytes(str);
 }
 
-
 bool Utils::stringReplace(std::wstring& str, const std::wstring& from, const std::wstring& to) {
     size_t start_pos = str.find(from);
     if(start_pos == std::wstring::npos)
         return false;
     str.replace(start_pos, from.length(), to);
     return true;
+}
+
+std::wstring Utils::generateUuid(unsigned int length) {
+    static std::wstring characters = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    wstring output;
+
+    for (unsigned int i = 0; i < length; i++) {
+        output += characters[rand() % characters.length()];
+    }
+
+    return output;
 }
