@@ -3,10 +3,9 @@
 //
 
 #include "Scope.h"
-#include "instructions/CallInstruction.h"
+#include "../compiler/instructions/CallInstruction.h"
 
 using namespace std;
-
 
 void Scope::Parse(TokenParser &parser) {
     while(true) {
@@ -78,6 +77,10 @@ void Scope::Parse(TokenParser &parser) {
     }
 
     // TODO: Return?
+}
+
+const vector<unique_ptr<Instruction>> &Scope::getInstructions() const {
+    return instructions;
 }
 
 const Variable* Scope::getVariable(const Token& token) const {

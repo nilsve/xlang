@@ -6,14 +6,13 @@
 #define XLANG_CALLNSTRUCTION_H
 
 
-#include "../../../utils/non_copyable.h"
 #include "Instruction.h"
-#include "../Variable.h"
+#include "../../interpreter/Variable.h"
 
 #include <memory>
 #include <vector>
 
-class CallInstruction : public non_copyable {
+class CallInstruction : public Instruction {
 private:
     std::wstring targetFunction;
     std::vector<const Variable*> parameters;

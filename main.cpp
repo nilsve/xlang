@@ -1,7 +1,8 @@
 #include <iostream>
 #include "parser/CodeFile.h"
 #include "parser/Parser.h"
-#include "parser/interpreter/Assembler.h"
+#include "parser/compiler/assemblers/NasmAssembler.h"
+#include "parser/compiler/Compiler.h"
 #include <ctime>
 
 int main() {
@@ -12,8 +13,8 @@ int main() {
         Parser parser(L"/Users/nils.van.eijk/Desktop/test/", L"main.x");
         parser.Parse();
 
-        Assembler assembler(parser);
-        assembler.Assemble();
+        Compiler<NasmAssembler> compiler(parser);
+//        compiler.Compile();
     }
 
     clock_t stop = clock();

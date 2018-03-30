@@ -9,7 +9,7 @@
 #include "../../utils/non_copyable.h"
 #include "../TokenParser.h"
 #include "Variable.h"
-#include "instructions/Instruction.h"
+#include "../compiler/instructions/Instruction.h"
 
 #include <vector>
 #include <memory>
@@ -27,6 +27,8 @@ private:
     const Variable* getVariable(const Token &token) const;
 public:
     void Parse(TokenParser& parser);
+
+    const std::vector<std::unique_ptr<Instruction>> &getInstructions() const;
 
 };
 

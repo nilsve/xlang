@@ -14,8 +14,6 @@ private:
     Instruction* targetScope;
 public:
     explicit JmpInstruction(Instruction* _targetScope) : targetScope(_targetScope) {}
-
-    void Assemble() override;
 };
 
 
