@@ -16,11 +16,10 @@
 class CallInstruction : public non_copyable {
 private:
     std::wstring targetFunction;
-    std::vector<std::weak_ptr<Variable>> parameters;
+    std::vector<const Variable*> parameters;
 
 public:
-    CallInstruction(std::wstring _targetFunction, std::vector<std::weak_ptr<Variable>> _parameters) : targetFunction(_targetFunction), parameters(_parameters) {}
-
+    CallInstruction(std::wstring _targetFunction, std::vector<const Variable*> _parameters) : targetFunction(_targetFunction), parameters(_parameters) {}
 };
 
 

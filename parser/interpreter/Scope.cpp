@@ -25,7 +25,7 @@ void Scope::Parse(TokenParser &parser) {
 
         } else {
             // Function call
-            std::vector<std::weak_ptr<Variable>> arguments;
+            vector<const Variable*> arguments;
             wstring moduleName, functionName;
             functionName = token.token;
 
@@ -48,12 +48,12 @@ void Scope::Parse(TokenParser &parser) {
             while(token != L")") {
                 // Handle arguments
 
-                weak_ptr<Variable> argument;
-                if (!getVariable(token, argument)) {
-                    parser.throwError(L"Unknown variable " + token.token);
+                const Variable* argument = nullptr;
+                if (!(argument = getVariable(token))) {
+                    return parser.throwError(L"Unknown variable " + token.token);
                 }
 
-                arguments.push_back(std::move(argument));
+                arguments.push_back(argument);
 
                 token = parser.getToken(false);
 
@@ -82,20 +82,18 @@ void Scope::Parse(TokenParser &parser) {
     // TODO: Return?
 }
 
-bool Scope::getVariable(const Token& token, weak_ptr<Variable>& variable) {
-    for (auto& _variable : variables) {
-        if (token == _variable->getVariableName()) {
-            variable = _variable;
-            return true;
+const Variable* Scope::getVariable(const Token& token) const {
+    for (auto& variable : variables) {
+        if (token == variable->getVariableName()) {
+            return variable.get();
         }
     }
 
-    return false;
+    return nullptr;
 }
 
-bool Scope::isVariable(const Token& token) {
-    weak_ptr<Variable> _var;
-    return getVariable(token, _var);
+bool Scope::isVariable(const Token& token) const {
+    return getVariable(token) != nullptr;
 }
 
 std::unique_ptr<Scope> Scope::parseNestedScope(TokenParser &parser) {

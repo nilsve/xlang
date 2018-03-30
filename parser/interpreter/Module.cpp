@@ -34,25 +34,25 @@ void Module::Parse(TokenParser& parser) {
 }
 
 void Module::parseVariable(TokenParser& parser, const Token& dataType) {
-    auto variable = make_shared<Variable>(dataType.token);
+    auto variable = make_unique<Variable>(dataType.token);
     variable->Parse(parser);
-    variables.push_back(variable);
+    variables.push_back(std::move(variable));
 }
 
 void Module::parseFunction(TokenParser& parser) {
-    auto function = make_shared<Function>();
+    auto function = make_unique<Function>();
     function->Parse(parser);
-    functions.push_back(function);
+    functions.push_back(std::move(function));
 }
 
 std::wstring Module::getModuleName() const {
     return moduleName;
 }
 
-const std::vector<std::shared_ptr<Function>> &Module::getFunctions() const {
+const std::vector<std::unique_ptr<Function>> &Module::getFunctions() const {
     return functions;
 }
 
-const std::vector<std::shared_ptr<Variable>> &Module::getVariables() const {
+const std::vector<std::unique_ptr<Variable>> &Module::getVariables() const {
     return variables;
 }

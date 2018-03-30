@@ -28,7 +28,6 @@ void Function::parseHeader(TokenParser& parser) {
         token = parser.getToken(false);
     }
 
-
     if (token != L"(") {
         parser.throwError("Expected (");
     }
@@ -68,7 +67,7 @@ void Function::parseHeader(TokenParser& parser) {
 }
 
 void Function::parseBody(TokenParser& parser) {
-    rootScope = make_shared<Scope>();
+    rootScope = make_unique<Scope>();
     rootScope->Parse(parser);
 }
 
@@ -90,7 +89,7 @@ CallingConvention Function::getCallingConvention() const {
     return callingConvention;
 }
 
-const vector<shared_ptr<Variable>> &Function::getParameters() const {
+const vector<unique_ptr<Variable>> &Function::getParameters() const {
     return parameters;
 }
 
@@ -98,6 +97,6 @@ const unique_ptr<Variable> &Function::getReturnVariable() const {
     return returnVariable;
 }
 
-const shared_ptr<Scope> &Function::getRootScope() const {
+const unique_ptr<Scope> &Function::getRootScope() const {
     return rootScope;
 }

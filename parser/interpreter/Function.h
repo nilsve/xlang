@@ -24,10 +24,10 @@ private:
     std::wstring functionName;
     CallingConvention callingConvention;
 
-    std::vector<std::shared_ptr<Variable>> parameters;
+    std::vector<std::unique_ptr<Variable>> parameters;
     std::unique_ptr<Variable> returnVariable;
 
-    std::shared_ptr<Scope> rootScope;
+    std::unique_ptr<Scope> rootScope;
 
     void parseHeader(TokenParser& parser);
     void parseBody(TokenParser& parser);
@@ -38,9 +38,9 @@ public:
 
     const std::wstring &getFunctionName() const;
     CallingConvention getCallingConvention() const;
-    const std::vector<std::shared_ptr<Variable>> &getParameters() const;
+    const std::vector<std::unique_ptr<Variable>> &getParameters() const;
     const std::unique_ptr<Variable> &getReturnVariable() const;
-    const std::shared_ptr<Scope> &getRootScope() const;
+    const std::unique_ptr<Scope> &getRootScope() const;
 };
 
 

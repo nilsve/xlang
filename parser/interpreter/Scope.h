@@ -16,14 +16,15 @@
 
 class Scope : public non_copyable {
 private:
-    std::vector<std::shared_ptr<Scope>> scopes;
-    std::vector<std::shared_ptr<Variable>> variables;
+    std::vector<std::unique_ptr<Scope>> scopes;
+    std::vector<std::unique_ptr<Variable>> variables;
     std::vector<std::unique_ptr<Instruction>> instructions;
+    std::vector<std::unique_ptr<std::wstring>> stringConstants;
 
     std::unique_ptr<Scope> parseNestedScope(TokenParser& parser);
 
-    bool isVariable(const Token& token);
-    bool getVariable(const Token &token, std::weak_ptr<Variable>& variable);
+    bool isVariable(const Token& token) const;
+    const Variable* getVariable(const Token &token) const;
 public:
     void Parse(TokenParser& parser);
 

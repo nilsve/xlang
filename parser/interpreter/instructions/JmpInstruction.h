@@ -11,9 +11,9 @@
 
 class JmpInstruction : public Instruction {
 private:
-    std::weak_ptr<Instruction> targetScope;
+    Instruction* targetScope;
 public:
-    JmpInstruction(std::shared_ptr<Instruction> _targetScope) : targetScope(_targetScope) {}
+    JmpInstruction(Instruction* _targetScope) : targetScope(_targetScope) {}
     void Assemble();
 };
 
