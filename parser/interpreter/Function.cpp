@@ -24,33 +24,39 @@ void Function::parseHeader(TokenParser& parser) {
         } else {
             parser.throwError("Unexpected token after function name!");
         }
+
+        token = parser.getToken(false);
     }
 
-    token = parser.getToken(false);
 
     if (token != L"(") {
         parser.throwError("Expected (");
     }
 
     bool firstToken = true;
-    while(token != L")") {
-        // Handle parameters
 
-        auto parameter = Variable::parseFunctionArg(parser);
-        parameters.push_back(std::move(parameter));
+    if (parser.peekToken(false) != L")") {
+        while (token != L")") {
+            // Handle parameters
 
-        token = parser.getToken(false);
-
-        if (!firstToken) {
-            // comma expected
-            if (token != L",") {
-                parser.throwError("Comma expected");
-            }
+            auto parameter = Variable::parseFunctionArg(parser);
+            parameters.push_back(std::move(parameter));
 
             token = parser.getToken(false);
 
+            if (!firstToken) {
+                // comma expected
+                if (token != L",") {
+                    parser.throwError("Comma expected");
+                }
+
+                token = parser.getToken(false);
+
+            }
+            firstToken = false;
         }
-        firstToken = false;
+    } else {
+        parser.eatToken();
     }
 
     token = parser.getToken(false);

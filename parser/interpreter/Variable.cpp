@@ -22,34 +22,42 @@ bool Variable::isVariableType(const Token& token) {
 void Variable::Parse(TokenParser &parser) {
     auto token = parser.getToken(false);
 
-    if (token == L"[") {
+    if (token == L"[" || token == L"*") {
+        switch (token.token[0]) {
+            case L'[':
+                //FIXME: No array support yet.
+                parser.throwError("No array support!");
 
-        if (isFunctionArgument) {
-            parser.throwError("Function argument can't be an array!");
-        }
+                if (isFunctionArgument) {
+                    parser.throwError("Function argument can't be an array!");
+                }
 
-        isArray = true;
+                isArray = true;
 
-        token = parser.getToken(false);
+                token = parser.getToken(false);
 
-        if (token == L"]") {
-            // Array of yet unknown length
-        } else {
+                if (token == L"]") {
+                    // Array of yet unknown length
+                } else {
 
-            if (isFunctionArgument) {
-                parser.throwError(L"Function argument of type array can't have fixed size!");
-            }
+                    if (isFunctionArgument) {
+                        parser.throwError(L"Function argument of type array can't have fixed size!");
+                    }
 
-            std::wstringstream ss(token.token);
-            if ((ss >> arrayLength).fail() || !(ss >> std::ws).eof())
-            {
-                return parser.throwError("Expected number in array declaration!");
-            }
+                    std::wstringstream ss(token.token);
+                    if ((ss >> arrayLength).fail() || !(ss >> std::ws).eof()) {
+                        return parser.throwError("Expected number in array declaration!");
+                    }
 
-            token = parser.getToken(false);
-            if (token != L"]") {
-                parser.throwError("Expected ] character");
-            }
+                    token = parser.getToken(false);
+                    if (token != L"]") {
+                        parser.throwError("Expected ] character");
+                    }
+                }
+                break;
+            case L'*':
+                isPointer = true;
+                break;
         }
 
         // Variable name
@@ -58,7 +66,7 @@ void Variable::Parse(TokenParser &parser) {
 
     variableName = token.token;
 
-    if (!isFunctionArgument) {
+    /*if (!isFunctionArgument) {
         // Function arguments can't have default values TODO
 
         token = parser.peekToken(false);
@@ -71,7 +79,7 @@ void Variable::Parse(TokenParser &parser) {
 
             //FIXME
         }
-    }
+    }*/
 
     string errorMessage;
     if (validateVariable(errorMessage)) {

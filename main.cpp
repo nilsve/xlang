@@ -2,15 +2,24 @@
 #include "parser/CodeFile.h"
 #include "parser/Parser.h"
 #include "parser/interpreter/Assembler.h"
+#include <time.h>
 
 int main() {
 
-    Parser parser(L"/Users/nils.van.eijk/Desktop/test/", L"main.x");
-    parser.Parse();
+    clock_t start = clock();
 
-    Assembler assembler(parser);
-    assembler.Assemble();
+    for(int i = 0; i < 10000; i++) {
+        Parser parser(L"/Users/nils.van.eijk/Desktop/test/", L"main.x");
+        parser.Parse();
 
-    std::cout << "Hello, World!" << std::endl;
+        Assembler assembler(parser);
+        assembler.Assemble();
+    }
+
+    clock_t stop = clock();
+
+    double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
+    printf("\nTime elapsed: %.5f\n", elapsed);
+
     return 0;
 }
