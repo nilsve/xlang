@@ -16,9 +16,11 @@ void Scope::Parse(TokenParser &parser) {
         if (token == L"{") {
             auto scope = parseNestedScope(parser);
 
-            auto target = scope->getParent()->getParent()->getModuleName() + L"_" + scope->getParent()->getFunctionName() + L"_" + scope->getScopeId();
+            auto moduleName = scope->getParent()->getParent()->getModuleName();
+            auto functionName = scope->getParent()->getFunctionName();
+            auto scopeId = scope->getScopeId();
 
-            auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(std::move(target))));
+            auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(std::move(moduleName), std::move(functionName), std::move(scopeId))));
             instructions.emplace_back(std::move(call));
 
             scopes.push_back(std::move(scope));
@@ -31,16 +33,19 @@ void Scope::Parse(TokenParser &parser) {
         } else {
             // Function call
             vector<const Variable*> arguments;
-            wstring moduleName, functionName;
-            functionName = this->getParent()->getParent()->getModuleName() + L"." + token.token;
+            wstring moduleName;
+            wstring functionName = token.token;
 
             token = parser.getToken(false);
 
             if (token == L".") {
                 // Function name isn't function name but module name
-                moduleName = functionName;
+                moduleName = std::move(functionName);
                 token = parser.getToken(false);
                 functionName = token.token;
+                token = parser.getToken(false);
+            } else {
+                moduleName = this->getParent()->getParent()->getModuleName();
             }
 
             if (token != L"(") {
@@ -78,7 +83,7 @@ void Scope::Parse(TokenParser &parser) {
                 parser.throwError("Expected ; after function call!");
             }
 
-            auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(functionName, std::move(arguments))));
+            auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(std::move(moduleName), std::move(functionName), L"", std::move(arguments))));
 
             instructions.emplace_back(std::move(call));
         }
@@ -117,4 +122,8 @@ const wstring &Scope::getScopeId() const {
 
 const Function *Scope::getParent() const {
     return parent;
+}
+
+const vector<unique_ptr<Scope>> &Scope::getScopes() const {
+    return scopes;
 }

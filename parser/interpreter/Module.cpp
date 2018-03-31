@@ -18,10 +18,14 @@ void Module::Parse(TokenParser& parser) {
 
     this->moduleName = moduleName.token;
 
+    if (parser.getToken(false) != L"{") {
+        parser.throwError("Expected { after module name");
+    }
+
     while(true) {
         auto token = parser.getToken(false);
 
-        if (token == L"") {
+        if (token == L"}") {
             break;
         } else if (token == L"function") {
             parseFunction(parser);

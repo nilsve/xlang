@@ -55,3 +55,11 @@ std::wstring Utils::generateUuid(unsigned int length) {
 
     return output;
 }
+
+void Utils::throwError(std::wstring message) {
+    return throwError(Utils::wstring_to_utf8(message));
+}
+
+void Utils::throwError(std::string message) {
+    throw std::invalid_argument(message.c_str());
+}

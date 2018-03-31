@@ -87,14 +87,6 @@ wchar_t TokenParser::getStringLiteral(wchar_t chr) {
     }
 }
 
-void TokenParser::throwError(std::wstring message) const {
-    return throwError(Utils::wstring_to_utf8(message));
-}
-
-void TokenParser::throwError(std::string message) const {
-    throw std::invalid_argument(message.c_str());
-}
-
 bool Token::operator==(const std::wstring &other) const {
     return this->token == other;
 }

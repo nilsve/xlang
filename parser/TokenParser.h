@@ -6,8 +6,8 @@
 #define XLANG_TOKENPARSER_H
 
 #include <string>
-#include <jmorecfg.h>
 #include "../utils/non_copyable.h"
+#include "../utils/Utils.h"
 
 struct Token {
     bool isStringLiteral = false;
@@ -31,8 +31,10 @@ public:
     const Token getToken(bool allowStringLiteral = true);
     Token peekToken(bool allowStringLiteral = true);
 
-    void throwError(std::wstring message) const;
-    void throwError(std::string message) const;
+    template <typename T>
+    void throwError(T message) const {
+        return Utils::throwError(message);
+    }
 
     void eatToken();
 

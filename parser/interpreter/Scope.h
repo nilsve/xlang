@@ -33,13 +33,15 @@ private:
 
     const Variable* getVariable(const Token &token) const;
 public:
-    Scope(const Function* _parent) : parent(_parent), scopeId(Utils::generateUuid()) {}
+    Scope(const Function* _parent) : scopeId(Utils::generateUuid()), parent(_parent) {}
     void Parse(TokenParser& parser);
 
     const std::vector<std::unique_ptr<Instruction>> &getInstructions() const;
 
     const std::wstring &getScopeId() const;
     const Function *getParent() const;
+
+    const std::vector<std::unique_ptr<Scope>> &getScopes() const;
 
 };
 

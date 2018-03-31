@@ -13,15 +13,34 @@
 #include <vector>
 
 class CallInstruction : public Instruction {
-private:
-    std::wstring target;
-    std::vector<const Variable*> parameters;
-
 public:
-    CallInstruction(std::wstring _target, std::vector<const Variable*> _parameters) : target(std::move(_target)), parameters(std::move(_parameters)) {}
-    CallInstruction(std::wstring _target) : target(std::move(_target)) {}
+    const std::wstring moduleName;
+    const std::wstring functionName;
+    const std::wstring scopeId;
+    const std::vector<const Variable*> parameters;
 
-    const std::wstring& getTarget() const {return target;}
+    CallInstruction(std::wstring _moduleName, std::wstring _functionName, std::wstring _scopeId, std::vector<const Variable*> _parameters) : moduleName(std::move(_moduleName)),
+                                                                                                                                             functionName(std::move(_functionName)),
+                                                                                                                                             scopeId(std::move(_scopeId)),
+                                                                                                                                             parameters(std::move(_parameters)) {}
+    CallInstruction(std::wstring _moduleName, std::wstring _functionName, std::wstring _scopeId) : moduleName(std::move(_moduleName)),
+                                                                                                   functionName(std::move(_functionName)),
+                                                                                                   scopeId(std::move(_scopeId)) {}
+
+    std::wstring getTarget() const {
+        std::wstring target;
+        if (moduleName.length()) {
+            target += moduleName;
+        }
+        if (functionName.length()) {
+            target += L"_" + functionName;
+        }
+        if (scopeId.length()) {
+            target += L"_" + scopeId;
+        }
+
+        return target;
+    }
 };
 
 
