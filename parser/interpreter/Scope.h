@@ -28,6 +28,9 @@ private:
     std::vector<std::unique_ptr<std::wstring>> stringConstants;
 
     std::unique_ptr<Scope> parseNestedScope(TokenParser& parser);
+    void parseFunctionCall(TokenParser& parser);
+    void parseVariableDeclaration(TokenParser& parser);
+    void updateVariable(TokenParser &parser, Variable& variable);
 
     bool isVariable(const Token& token) const;
 

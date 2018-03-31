@@ -14,9 +14,7 @@ using namespace std;
 std::wstring Utils::readFile(const std::wstring& fileName) {
     ifstream file(Utils::wstring_to_utf8(fileName).c_str());
     if (!file.is_open()) {
-        cout << strerror(errno);
-
-        // TODO :Crash oid
+        Utils::throwError(L"Couldn't open file " + fileName + L": " + utf8_to_wstring(strerror(errno)));
     }
 
     stringstream wss;
@@ -62,4 +60,12 @@ void Utils::throwError(std::wstring message) {
 
 void Utils::throwError(std::string message) {
     throw std::invalid_argument(message.c_str());
+}
+
+void Utils::Log(std::string message) {
+    return Log(Utils::utf8_to_wstring(message));
+}
+
+void Utils::Log(std::wstring message) {
+    std::wcout << message;
 }

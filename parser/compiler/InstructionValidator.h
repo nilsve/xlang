@@ -17,6 +17,8 @@ class InstructionValidator {
 
         bool findScopeId(const Scope& rootScope, std::wstring scopeId) const;
 
+        void validateCallInstruction(const CallInstruction& callInstruction) const;
+
     public:
         InstructionValidator(const Parser& _parser) : parser(_parser) {}
 

@@ -17,11 +17,11 @@ using namespace std;
 void CodeFile::resolveImports() {
     TokenParser parser(code);
     while (true) {
-        const Token token = parser.getToken();
+        const Token token = parser.getToken(true);
 
         if (!token.isStringLiteral) {
             if (token == L"#import") {
-                const Token fileToken = parser.getToken();
+                const Token fileToken = parser.getToken(true);
                 if (!fileToken.isStringLiteral) {
                     parser.throwError("Expected a string literal after #include");
                 } else {
@@ -56,6 +56,6 @@ CodeFile::CodeFile(std::wstring relativePath, Parser &parser) : parser(parser), 
     this->code = Utils::readFile(resolvePath(relativePath));
 }
 
-const std::wstring &CodeFile::getCode() {
+const std::wstring &CodeFile::getCode() const {
     return code;
 }

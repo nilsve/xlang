@@ -24,7 +24,7 @@ void Parser::Parse() {
     TokenParser parser(mainFile->getCode());
 
     while(true) {
-        auto token = parser.getToken(false);
+        auto token = parser.peekToken();
 
         if (token == L"") {
             break;

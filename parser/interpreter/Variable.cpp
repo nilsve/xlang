@@ -20,7 +20,9 @@ bool Variable::isVariableType(const Token& token) {
 }
 
 void Variable::Parse(TokenParser &parser) {
-    auto token = parser.getToken(false);
+    auto token = parser.getToken();
+    dataType = token.token;
+    token = parser.getToken();
 
     if (token == L"[" || token == L"*") {
         switch (token.token[0]) {
@@ -34,7 +36,7 @@ void Variable::Parse(TokenParser &parser) {
 
                 isArray = true;
 
-                token = parser.getToken(false);
+                token = parser.getToken();
 
                 if (token == L"]") {
                     // Array of yet unknown length
@@ -49,7 +51,7 @@ void Variable::Parse(TokenParser &parser) {
                         return parser.throwError("Expected number in array declaration!");
                     }
 
-                    token = parser.getToken(false);
+                    token = parser.getToken();
                     if (token != L"]") {
                         parser.throwError("Expected ] character");
                     }
@@ -61,7 +63,7 @@ void Variable::Parse(TokenParser &parser) {
         }
 
         // Variable name
-        token = parser.getToken(false);
+        token = parser.getToken();
     }
 
     variableName = token.token;
@@ -101,8 +103,7 @@ bool Variable::validateVariable(std::string& result) {
 }
 
 std::unique_ptr<Variable> Variable::parseFunctionArg(TokenParser &parser) {
-    auto token = parser.getToken(false);
-    auto result = make_unique<Variable>(token.token, true);
+    auto result = make_unique<Variable>(true);
     result->Parse(parser);
     return result;
 }

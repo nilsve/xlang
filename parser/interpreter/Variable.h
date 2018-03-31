@@ -12,7 +12,7 @@
 
 class Variable : public non_copyable {
 private:
-    const std::wstring dataType;
+    std::wstring dataType;
     const bool isFunctionArgument;
     std::wstring variableName;
 
@@ -22,8 +22,7 @@ private:
 
     bool validateVariable(std::string& result);
 public:
-    Variable() : isFunctionArgument(false) {}
-    explicit Variable(std::wstring dataType, bool isFunctionArgument = false) : dataType(std::move(dataType)), isFunctionArgument(isFunctionArgument) {}
+    explicit Variable(bool isFunctionArgument = false) : isFunctionArgument(isFunctionArgument) {}
 
     void Parse(TokenParser& parser);
 

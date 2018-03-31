@@ -6,12 +6,15 @@
 #include "../compiler/instructions/CallInstruction.h"
 #include "Function.h"
 #include "Module.h"
+#include <cassert>
 
 using namespace std;
 
 void Scope::Parse(TokenParser &parser) {
+    assert(parser.getToken() == L"{");
+
     while(true) {
-        auto token = parser.getToken(false);
+        auto token = parser.peekToken();
 
         if (token == L"{") {
             auto scope = parseNestedScope(parser);
@@ -25,71 +28,78 @@ void Scope::Parse(TokenParser &parser) {
 
             scopes.push_back(std::move(scope));
         } else if (token == L"}") {
+            parser.eatToken();
             break;
         } else if (Variable::isVariableType(token)) {
-
+            parseVariableDeclaration(parser);
         } else if (isVariable(token)) {
 
         } else {
             // Function call
-            vector<const Variable*> arguments;
-            wstring moduleName;
-            wstring functionName = token.token;
-
-            token = parser.getToken(false);
-
-            if (token == L".") {
-                // Function name isn't function name but module name
-                moduleName = std::move(functionName);
-                token = parser.getToken(false);
-                functionName = token.token;
-                token = parser.getToken(false);
-            } else {
-                moduleName = this->getParent()->getParent()->getModuleName();
-            }
-
-            if (token != L"(") {
-                parser.throwError("Expected ( after functionname");
-            }
-
-            token = parser.getToken(false);
-
-            bool firstToken = true;
-            while(token != L")") {
-                // Handle arguments
-
-                const Variable* argument = nullptr;
-                if (!(argument = getVariable(token))) {
-                    return parser.throwError(L"Unknown variable " + token.token);
-                }
-
-                arguments.push_back(argument);
-
-                token = parser.getToken(false);
-
-                if (!firstToken) {
-                    // comma expected
-                    if (token != L",") {
-                        parser.throwError("Comma expected");
-                    }
-
-                    token = parser.getToken(false);
-
-                }
-                firstToken = false;
-            }
-
-            if (parser.getToken(false) != L";") {
-                parser.throwError("Expected ; after function call!");
-            }
-
-            auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(std::move(moduleName), std::move(functionName), L"", std::move(arguments))));
-
-            instructions.emplace_back(std::move(call));
+            parseFunctionCall(parser);
         }
     }
 
     // TODO: Return?
+}
+
+void Scope::parseFunctionCall(TokenParser& parser) {
+    auto token = parser.getToken();
+
+    vector<const Variable*> arguments;
+    wstring moduleName;
+    wstring functionName = token.token;
+
+    token = parser.getToken();
+
+    if (token == L".") {
+        // Function name isn't function name but module name
+        moduleName = std::move(functionName);
+        token = parser.getToken();
+        functionName = token.token;
+        token = parser.getToken();
+    } else {
+        moduleName = this->getParent()->getParent()->getModuleName();
+    }
+
+    if (token != L"(") {
+        parser.throwError("Expected ( after functionname");
+    }
+
+    token = parser.getToken();
+
+    bool firstToken = true;
+    while(token != L")") {
+        // Handle arguments
+
+        const Variable* argument = nullptr;
+        if (!(argument = getVariable(token))) {
+            return parser.throwError(L"Unknown variable " + token.token);
+        }
+
+        arguments.push_back(argument);
+
+        token = parser.getToken();
+
+        if (!firstToken) {
+            // comma expected
+            if (token != L",") {
+                parser.throwError("Comma expected");
+            }
+
+            token = parser.getToken();
+
+        }
+        firstToken = false;
+    }
+
+    if (parser.getToken() != L";") {
+        parser.throwError("Expected ; after function call!");
+    }
+
+    auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(std::move(moduleName), std::move(functionName), L"", std::move(arguments))));
+
+    instructions.emplace_back(std::move(call));
 }
 
 const vector<unique_ptr<Instruction>> &Scope::getInstructions() const {
@@ -126,4 +136,27 @@ const Function *Scope::getParent() const {
 
 const vector<unique_ptr<Scope>> &Scope::getScopes() const {
     return scopes;
+}
+
+void Scope::updateVariable(TokenParser &parser, Variable& variable) {
+    assert(parser.getToken() == L"=");
+
+
+}
+
+void Scope::parseVariableDeclaration(TokenParser &parser) {
+    auto variable = make_unique<Variable>();
+    variable->Parse(parser);
+
+    auto token = parser.peekToken();
+    if (token == L"=") {
+        // Update variable
+        updateVariable(parser, *variable);
+    } else if (token != L";") {
+        parser.throwError("Unexpected token after variable declaration!");
+    } else {
+        parser.eatToken();
+    }
+
+    variables.push_back(std::move(variable));
 }

@@ -23,13 +23,17 @@ private:
     const std::wstring& code;
     unsigned long position = 0;
 
+    bool tokenAvailable = false;
+    unsigned long afterPeekPosition = 0;
+    Token peekedToken;
+
     static bool isWhitespace(wchar_t chr);
     static wchar_t getStringLiteral(wchar_t chr);
     static bool isSpecialChar(wchar_t chr);
 public:
     explicit TokenParser(const std::wstring& code) : code(code) {}
-    const Token getToken(bool allowStringLiteral = true);
-    Token peekToken(bool allowStringLiteral = true);
+    const Token getToken(bool allowStringLiteral = false);
+    const Token peekToken(bool allowStringLiteral = false);
 
     template <typename T>
     void throwError(T message) const {

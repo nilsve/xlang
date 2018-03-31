@@ -18,7 +18,7 @@ private:
     std::vector<std::unique_ptr<Variable>> variables;
 
     void parseFunction(TokenParser &parser);
-    void parseVariable(TokenParser &parser, const Token& dataType);
+    void parseVariable(TokenParser &parser);
 public:
     void Parse(TokenParser& parser);
 

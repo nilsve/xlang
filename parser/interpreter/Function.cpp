@@ -4,6 +4,8 @@
 
 #include "Function.h"
 
+#include <cassert>
+
 using namespace std;
 
 void Function::Parse(TokenParser &parser) {
@@ -12,10 +14,12 @@ void Function::Parse(TokenParser &parser) {
 }
 
 void Function::parseHeader(TokenParser& parser) {
-    auto functionName = parser.getToken(false);
+    assert(parser.getToken() == L"function");
+
+    auto functionName = parser.getToken();
     this->functionName = functionName.token;
 
-    auto token = parser.getToken(false);
+    auto token = parser.getToken();
 
     if (token != L"(") {
         CallingConvention convention = getCallingConvention(token.token);
@@ -25,7 +29,7 @@ void Function::parseHeader(TokenParser& parser) {
             parser.throwError("Unexpected token after function name!");
         }
 
-        token = parser.getToken(false);
+        token = parser.getToken();
     }
 
     if (token != L"(") {
@@ -41,7 +45,7 @@ void Function::parseHeader(TokenParser& parser) {
             auto parameter = Variable::parseFunctionArg(parser);
             parameters.push_back(std::move(parameter));
 
-            token = parser.getToken(false);
+            token = parser.getToken();
 
             if (!firstToken) {
                 // comma expected
@@ -49,7 +53,7 @@ void Function::parseHeader(TokenParser& parser) {
                     parser.throwError("Comma expected");
                 }
 
-                token = parser.getToken(false);
+                token = parser.getToken();
 
             }
             firstToken = false;
@@ -58,11 +62,12 @@ void Function::parseHeader(TokenParser& parser) {
         parser.eatToken();
     }
 
-    token = parser.getToken(false);
+    token = parser.peekToken();
 
     if (token == L":") {
         // Return type
-        token = parser.getToken(false);
+        parser.eatToken();
+        token = parser.getToken();
     }
 }
 
