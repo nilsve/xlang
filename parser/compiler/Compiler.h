@@ -57,9 +57,8 @@ private:
 
     inline void compileScope(const Scope &scope) {
         appendOutput(assembler.assembleScopeStart(scope));
-        auto& instructions = scope.getInstructions();
 
-        for (auto& instruction : instructions) {
+        for (auto& instruction : scope.getInstructions()) {
             appendOutput(assembler.assembleInstruction(*instruction));
         }
     }

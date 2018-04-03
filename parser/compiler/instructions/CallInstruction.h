@@ -21,8 +21,13 @@ public:
     CallInstruction(std::wstring _target, std::vector<const Variable*> _parameters) : target(std::move(_target)), parameters(std::move(_parameters)) {}
     CallInstruction(std::wstring _target) : target(std::move(_target)) {}
 
-    const std::wstring& getTarget() const {return target;}
-};
+    const std::wstring& getTarget() const {
+        return target;
+    }
 
+    const std::vector<const Variable *> &getParameters() const {
+        return parameters;
+    }
+};
 
 #endif //XLANG_CALLNSTRUCTION_H

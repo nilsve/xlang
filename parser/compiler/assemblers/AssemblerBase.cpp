@@ -9,5 +9,5 @@ std::wstring AssemblerBase::assembleFunctionStart(const Function &function) cons
 }
 
 std::wstring AssemblerBase::assembleScopeStart(const Scope &scope) const {
-    return scope.getParent()->getParent()->getModuleName() + L"_" + scope.getParent()->getFunctionName() + L"_" + scope.getScopeId();
+    return scope.getParentFunction()->getParent()->getModuleName() + L"_" + scope.getParentFunction()->getFunctionName() + L"_" + scope.getScopeId();
 }

@@ -16,7 +16,7 @@ void Scope::Parse(TokenParser &parser) {
         if (token == L"{") {
             auto scope = parseNestedScope(parser);
 
-            auto target = scope->getParent()->getParent()->getModuleName() + L"_" + scope->getParent()->getFunctionName() + L"_" + scope->getScopeId();
+            auto target = scope->getParentFunction()->getParent()->getModuleName() + L"_" + scope->getParentFunction()->getFunctionName() + L"_" + scope->getScopeId();
 
             auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(std::move(target))));
             instructions.emplace_back(std::move(call));
@@ -32,7 +32,7 @@ void Scope::Parse(TokenParser &parser) {
             // Function call
             vector<const Variable*> arguments;
             wstring moduleName, functionName;
-            functionName = this->getParent()->getParent()->getModuleName() + L"." + token.token;
+            functionName = this->getParentFunction()->getParent()->getModuleName() + L"." + token.token;
 
             token = parser.getToken(false);
 
@@ -106,7 +106,7 @@ bool Scope::isVariable(const Token& token) const {
 }
 
 std::unique_ptr<Scope> Scope::parseNestedScope(TokenParser &parser) {
-    auto result = make_unique<Scope>(getParent());
+    auto result = make_unique<Scope>(getParentFunction());
     result->Parse(parser);
     return result;
 }
@@ -115,6 +115,10 @@ const wstring &Scope::getScopeId() const {
     return scopeId;
 }
 
-const Function *Scope::getParent() const {
-    return parent;
+const Function *Scope::getParentFunction() const {
+    return parentFunction;
+}
+
+const Scope *Scope::getParentScope() const {
+    return parentScope;
 }

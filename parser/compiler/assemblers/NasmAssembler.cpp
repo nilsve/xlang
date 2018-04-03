@@ -4,12 +4,16 @@
 
 #include "NasmAssembler.h"
 #include "../instructions/CallInstruction.h"
-#include "../../interpreter/Module.h"
 
 #include <iostream>
 
 std::wstring NasmAssembler::assembleInstruction(const Instruction& instruction) const {
     if (auto callInstruction = dynamic_cast<const CallInstruction*>(&instruction)) {
+
+        for (auto& parameter : callInstruction->getParameters()) {
+
+        }
+
         return L"call " + callInstruction->getTarget();
     }
 
