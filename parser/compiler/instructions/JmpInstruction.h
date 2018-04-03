@@ -11,9 +11,13 @@
 
 class JmpInstruction : public Instruction {
 private:
-    Instruction* targetScope;
+    const Instruction* targetScope;
 public:
     explicit JmpInstruction(Instruction* _targetScope) : targetScope(_targetScope) {}
+
+    const Instruction *getTargetScope() const {
+        return targetScope;
+    }
 };
 
 

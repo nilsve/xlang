@@ -19,7 +19,7 @@ private:
     std::wstring resolvePath(std::wstring relativePath);
 public:
     CodeFile(std::wstring relativePath, Parser& parser);
-    const std::wstring& getCode();
+    const std::wstring& getCode() const;
     void Load();
 };
 

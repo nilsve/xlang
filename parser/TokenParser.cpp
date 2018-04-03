@@ -8,15 +8,19 @@
 
 using namespace std;
 
-Token TokenParser::peekToken(bool allowStringLiteral) {
+const Token TokenParser::peekToken(bool allowStringLiteral) {
     auto oldPosition = position;
-    auto token = getToken(allowStringLiteral);
+    peekedToken = getToken(allowStringLiteral);
+    afterPeekPosition = position;
     position = oldPosition;
-    return token;
+    tokenAvailable = true;
+
+    return peekedToken;
 }
 
 void TokenParser::eatToken() {
-    getToken();
+    tokenAvailable = false;
+    position = afterPeekPosition;
 }
 
 bool TokenParser::isWhitespace(wchar_t chr) {
@@ -24,6 +28,13 @@ bool TokenParser::isWhitespace(wchar_t chr) {
 }
 
 const Token TokenParser::getToken(bool allowStringLiteral) {
+
+    if (tokenAvailable) {
+        position = afterPeekPosition;
+        tokenAvailable = false;
+        return std::move(peekedToken);
+    }
+
     Token token;
     token.position = position;
 
@@ -85,14 +96,6 @@ wchar_t TokenParser::getStringLiteral(wchar_t chr) {
     } else {
         return 0;
     }
-}
-
-void TokenParser::throwError(std::wstring message) const {
-    return throwError(Utils::wstring_to_utf8(message));
-}
-
-void TokenParser::throwError(std::string message) const {
-    throw std::invalid_argument(message.c_str());
 }
 
 bool Token::operator==(const std::wstring &other) const {

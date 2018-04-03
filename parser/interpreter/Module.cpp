@@ -6,35 +6,39 @@
 #include "Function.h"
 
 #include <memory>
+#include <cassert>
 
 using namespace std;
 
 void Module::Parse(TokenParser& parser) {
-    auto moduleName = parser.getToken();
+    assert(parser.getToken() == L"module");
 
-    if (!moduleName.isStringLiteral) {
-        return parser.throwError("Expected string literal after module declaration!");
-    }
+    auto moduleName = parser.getToken(true);
 
     this->moduleName = moduleName.token;
 
-    while(true) {
-        auto token = parser.getToken(false);
+    if (parser.getToken() != L"{") {
+        parser.throwError("Expected { after module name");
+    }
 
-        if (token == L"") {
+    while(true) {
+        auto token = parser.peekToken();
+
+        if (token == L"}") {
+            parser.eatToken();
             break;
         } else if (token == L"function") {
             parseFunction(parser);
         } else if (Variable::isVariableType(token)) {
-            parseVariable(parser, token);
+            parseVariable(parser);
         } else {
             return parser.throwError(L"Unexpected token " + token.token);
         }
     }
 }
 
-void Module::parseVariable(TokenParser& parser, const Token& dataType) {
-    auto variable = make_unique<Variable>(dataType.token);
+void Module::parseVariable(TokenParser& parser) {
+    auto variable = make_unique<Variable>();
     variable->Parse(parser);
     variables.push_back(std::move(variable));
 }

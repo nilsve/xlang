@@ -7,7 +7,7 @@
 int main() {
 
 
-    Parser parser(L"/Users/nils.van.eijk/Desktop/test/", L"main.x");
+    Parser parser(L"/Users/nilsvaneijk/Desktop/test/", L"main.x");
     parser.Parse();
 
     Compiler<NasmAssembler> compiler(parser);

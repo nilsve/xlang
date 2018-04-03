@@ -9,17 +9,19 @@
 #include "../Parser.h"
 #include "../../utils/Utils.h"
 #include "./assemblers/AssemblerBase.h"
+#include "InstructionValidator.h"
 
 #include <vector>
 #include <type_traits>
 #include <map>
+#include <iostream>
 
 template <typename Assembler>
 class Compiler : public non_copyable {
     static_assert(std::is_base_of<AssemblerBase, Assembler>::value, "Assembler has to be derrived from AssemblerBase");
 private:
     const Parser& parser;
-
+    const std::unique_ptr<InstructionValidator> validator;
     Assembler assembler;
 
     std::wstring output;
@@ -59,16 +61,23 @@ private:
         appendOutput(assembler.assembleScopeStart(scope));
 
         for (auto& instruction : scope.getInstructions()) {
+            validator->validateInstruction(*instruction);
             appendOutput(assembler.assembleInstruction(*instruction));
+        }
+
+        auto& childScopes = scope.getScopes();
+
+        for (auto& childScope : childScopes) {
+            compileScope(*childScope);
         }
     }
 
-    void appendOutput(std::wstring line) {
+    inline void appendOutput(std::wstring line) {
         output += line + L"\n";
     }
 
 public:
-    explicit Compiler(const Parser& _parser) : parser(_parser){
+    explicit Compiler(const Parser& _parser) : parser(_parser), validator(std::make_unique<InstructionValidator>(parser)) {
         output.reserve(2048);
     }
 

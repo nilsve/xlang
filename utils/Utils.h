@@ -18,6 +18,12 @@ public:
     static std::string wstring_to_utf8 (const std::wstring& str);
     static std::wstring utf8_to_wstring (const std::string& str);
     static std::wstring generateUuid(unsigned int length = 5);
+
+    static void Log(std::wstring message);
+    static void Log(std::string message);
+
+    static void throwError(std::wstring message);
+    static void throwError(std::string message);
 };
 
 
