@@ -17,10 +17,11 @@ private:
     std::vector<unsigned char> data;
 
 public:
-    void operator =(const std::wstring& str) {
+    Data& operator =(const std::wstring& str) {
         auto utf8Str = Utils::wstring_to_utf8(str);
 
         data.insert(data.begin(), utf8Str.begin(), utf8Str.end());
+        return *this;
     }
 
     template <typename T>

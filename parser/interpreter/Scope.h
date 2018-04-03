@@ -31,12 +31,11 @@ private:
 
     std::unique_ptr<Scope> parseNestedScope(TokenParser& parser);
     void parseFunctionCall(TokenParser& parser);
-    void parseVariableDeclaration(TokenParser& parser);
-    void updateVariable(TokenParser &parser, Variable& variable);
-
-    bool isVariable(const Token& token) const;
+    void declareVariable(TokenParser &parser);
+    void updateVariable(TokenParser &parser, const Variable& variable);
 
     const Variable* getVariable(const Token &token) const;
+    unsigned int calculateVariableIndex() const;
 public:
     Scope(const Function* _parentFunction, const Scope* _parentScope) : scopeId(Utils::generateUuid()), parentFunction(_parentFunction), parentScope(_parentScope) {}
     void Parse(TokenParser& parser);

@@ -10,11 +10,15 @@
 #include "../TokenParser.h"
 #include <string>
 
+class Scope;
+
 class Variable : public non_copyable {
 private:
     std::wstring dataType;
     const bool isFunctionArgument;
     std::wstring variableName;
+
+    int variableIndex = -1; // Variable index (offset) on scope / module
 
     bool isPointer = false;
     bool isArray = false;
@@ -31,6 +35,9 @@ public:
     static std::unique_ptr<Variable> parseFunctionArg(TokenParser &parser);
 
     const std::wstring &getVariableName() const;
+
+    void setVariableIndex(int variableIndex);
+    int getVariableIndex() const;
 };
 
 

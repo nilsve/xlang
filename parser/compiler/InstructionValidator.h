@@ -20,7 +20,7 @@ class InstructionValidator {
         void validateCallInstruction(const CallInstruction& callInstruction) const;
 
     public:
-        InstructionValidator(const Parser& _parser) : parser(_parser) {}
+        explicit InstructionValidator(const Parser& _parser) : parser(_parser) {}
 
         void validateInstruction(const Instruction& instruction) const;
 };

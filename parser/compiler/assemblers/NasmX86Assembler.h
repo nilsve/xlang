@@ -12,13 +12,13 @@
 class NasmX86Assembler : public AssemblerBase {
 public:
     std::wstring assembleInstruction(const Instruction &instruction) const override;
-    std::wstring assembleFunctionEnd() const override;
 
     std::wstring assembleFunctionStart(const Function &function) const override;
-
-    std::wstring assembleScopeEnd(const Scope& scope) const override;
+    std::wstring assembleFunctionEnd() const override;
 
     std::wstring assembleScopeStart(const Scope &scope) const override;
+    std::wstring assembleScopeEnd(const Scope& scope) const override;
+
 };
 
 

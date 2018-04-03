@@ -107,3 +107,11 @@ std::unique_ptr<Variable> Variable::parseFunctionArg(TokenParser &parser) {
     result->Parse(parser);
     return result;
 }
+
+void Variable::setVariableIndex(int variableIndex) {
+    Variable::variableIndex = variableIndex;
+}
+
+int Variable::getVariableIndex() const {
+    return variableIndex;
+}

@@ -38,7 +38,7 @@ private:
 
     static CallingConvention getCallingConvention(const std::wstring& convention);
 public:
-    Function(const Module* _parent) : parent(_parent) {}
+    explicit Function(const Module* _parent) : parent(_parent) {}
     void Parse(TokenParser& parser);
 
     const std::wstring &getFunctionName() const;

@@ -7,6 +7,7 @@
 #include "Function.h"
 #include "Module.h"
 #include "Data.h"
+#include "../compiler/instructions/AssignInstruction.h"
 
 #include <cassert>
 #include <iostream>
@@ -34,9 +35,10 @@ void Scope::Parse(TokenParser &parser) {
             parser.eatToken();
             break;
         } else if (Variable::isVariableType(token)) {
-            parseVariableDeclaration(parser);
-        } else if (isVariable(token)) {
-
+            declareVariable(parser);
+        } else if (auto variable = getVariable(token)) {
+            parser.eatToken();
+            updateVariable(parser, *variable);
         } else {
             // Function call
             parseFunctionCall(parser);
@@ -116,11 +118,11 @@ const Variable* Scope::getVariable(const Token& token) const {
         }
     }
 
-    return nullptr;
-}
+    if (auto scope = getParentScope()) {
+        return scope->getVariable(token);
+    }
 
-bool Scope::isVariable(const Token& token) const {
-    return getVariable(token) != nullptr;
+    return nullptr;
 }
 
 std::unique_ptr<Scope> Scope::parseNestedScope(TokenParser &parser) {
@@ -145,7 +147,7 @@ const vector<unique_ptr<Scope>> &Scope::getScopes() const {
     return scopes;
 }
 
-void Scope::updateVariable(TokenParser &parser, Variable& variable) {
+void Scope::updateVariable(TokenParser &parser, const Variable& variable) {
     assert(parser.getToken() == L"=");
 
     auto token = parser.getToken(true);
@@ -158,26 +160,29 @@ void Scope::updateVariable(TokenParser &parser, Variable& variable) {
         assert(false); // Not implemented!
     }
 
+    instructions.push_back(std::make_unique<AssignInstruction>(variable, *_data));
+
     if (parser.getToken() != L";") {
         parser.throwError("Expected ;");
     }
 }
 
-void Scope::parseVariableDeclaration(TokenParser &parser) {
+void Scope::declareVariable(TokenParser &parser) {
     auto variable = make_unique<Variable>();
     variable->Parse(parser);
+    variable->setVariableIndex(calculateVariableIndex());
+    variables.push_back(std::move(variable));
 
+    auto& _var = variables.back();
     auto token = parser.peekToken();
     if (token == L"=") {
         // Update variable
-        updateVariable(parser, *variable);
+        updateVariable(parser, *_var);
     } else if (token != L";") {
         parser.throwError("Unexpected token after variable declaration!");
     } else {
         parser.eatToken();
     }
-
-    variables.push_back(std::move(variable));
 }
 
 const vector<unique_ptr<Variable>> &Scope::getVariables() const {
@@ -198,4 +203,14 @@ const Data& Scope::upsertData(T search) {
     data.push_back(std::move(d));
 
     return *data.back();
+}
+
+unsigned int Scope::calculateVariableIndex() const {
+    unsigned int index = variables.size();
+
+    if (auto parent = getParentScope()) {
+        index += parent->calculateVariableIndex();
+    }
+
+    return index;
 }

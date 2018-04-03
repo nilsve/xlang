@@ -16,6 +16,22 @@ private:
 
 public:
     AssignInstruction(const Variable& _target, const Data& _data) : target(&_target), data(&_data) {}
+
+    const Variable *getTarget() const {
+        return target;
+    }
+
+    void setTarget(const Variable *target) {
+        AssignInstruction::target = target;
+    }
+
+    const Data *getData() const {
+        return data;
+    }
+
+    void setData(const Data *data) {
+        AssignInstruction::data = data;
+    }
 };
 
 #endif //XLANG_ASSIGNINSTRUCTION_H
