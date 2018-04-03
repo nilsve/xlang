@@ -26,7 +26,7 @@ private:
 
     std::wstring output;
 
-    inline const Module* findModule(const std::vector<std::unique_ptr<Module>>& modules, std::wstring moduleName) const {
+    const Module* findModule(const std::vector<std::unique_ptr<Module>>& modules, std::wstring moduleName) const {
         for (auto& module : modules) {
             if (module->getModuleName() == moduleName) {
                 return module.get();
@@ -35,7 +35,7 @@ private:
 
         return nullptr;
     }
-    inline const Function* findFunction(const Module& module, std::wstring functionName) const {
+    const Function* findFunction(const Module& module, std::wstring functionName) const {
         for (auto& function : module.getFunctions()) {
             if (function->getFunctionName() == functionName) {
                 return function.get();
@@ -45,7 +45,7 @@ private:
         return nullptr;
     }
 
-    inline void compileModules(const std::vector<std::unique_ptr<Module>> &modules) {
+    void compileModules(const std::vector<std::unique_ptr<Module>> &modules) {
         for (auto& module : modules) {
             for (auto& function : module->getFunctions()) {
                 appendOutput(assembler.assembleFunctionStart(*function));
@@ -57,7 +57,7 @@ private:
         }
     }
 
-    inline void compileScope(const Scope &scope) {
+    void compileScope(const Scope &scope) {
         appendOutput(assembler.assembleScopeStart(scope));
 
         for (auto& instruction : scope.getInstructions()) {
@@ -72,7 +72,7 @@ private:
         }
     }
 
-    inline void appendOutput(std::wstring line) {
+    void appendOutput(std::wstring line) {
         output += line + L"\n";
     }
 

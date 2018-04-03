@@ -6,6 +6,7 @@
 #define XLANG_UTILS_H
 
 #include <string>
+#include <vector>
 
 class Utils {
 private:
@@ -19,8 +20,8 @@ public:
     static std::wstring utf8_to_wstring (const std::string& str);
     static std::wstring generateUuid(unsigned int length = 5);
 
-    static void Log(std::wstring message);
-    static void Log(std::string message);
+    static void Log(const std::wstring& message);
+    static void Log(const std::string& message);
 
     static void throwError(std::wstring message);
     static void throwError(std::string message);

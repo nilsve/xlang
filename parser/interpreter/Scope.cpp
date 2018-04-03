@@ -6,7 +6,10 @@
 #include "../compiler/instructions/CallInstruction.h"
 #include "Function.h"
 #include "Module.h"
+#include "Data.h"
+
 #include <cassert>
+#include <iostream>
 
 using namespace std;
 
@@ -145,7 +148,19 @@ const vector<unique_ptr<Scope>> &Scope::getScopes() const {
 void Scope::updateVariable(TokenParser &parser, Variable& variable) {
     assert(parser.getToken() == L"=");
 
+    auto token = parser.getToken(true);
 
+    const Data* _data = nullptr;
+
+    if (token.isStringLiteral) {
+        _data = &upsertData(token.token);
+    } else {
+        assert(false); // Not implemented!
+    }
+
+    if (parser.getToken() != L";") {
+        parser.throwError("Expected ;");
+    }
 }
 
 void Scope::parseVariableDeclaration(TokenParser &parser) {
@@ -163,4 +178,24 @@ void Scope::parseVariableDeclaration(TokenParser &parser) {
     }
 
     variables.push_back(std::move(variable));
+}
+
+const vector<unique_ptr<Variable>> &Scope::getVariables() const {
+    return variables;
+}
+
+template<typename T>
+const Data& Scope::upsertData(T search) {
+    for (auto& d : data) {
+        if (*d == search) {
+            return *d;
+        }
+    }
+
+    auto d = make_unique<Data>();
+    *d = search;
+
+    data.push_back(std::move(d));
+
+    return *data.back();
 }

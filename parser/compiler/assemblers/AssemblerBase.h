@@ -14,9 +14,15 @@ class AssemblerBase {
 public:
     virtual std::wstring assembleInstruction(const Instruction& instruction) const = 0;
     virtual std::wstring assembleFunctionEnd() const = 0;
+    virtual std::wstring assembleScopeEnd(const Scope& scope) const = 0;
 
-    std::wstring assembleFunctionStart(const Function & function) const;
-    std::wstring assembleScopeStart(const Scope& scope) const;
+    virtual std::wstring assembleFunctionStart(const Function & function) const {
+        return function.getParent()->getModuleName() + L"_" + function.getFunctionName() + L":";
+    };
+
+    virtual std::wstring assembleScopeStart(const Scope& scope) const {
+        return scope.getParentFunction()->getParent()->getModuleName() + L"_" + scope.getParentFunction()->getFunctionName() + L"_" + scope.getScopeId();
+    };
 };
 
 

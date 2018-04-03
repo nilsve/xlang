@@ -3,11 +3,13 @@
 //
 
 #include "Utils.h"
+#include "../parser/interpreter/Data.h"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <codecvt>
+#include <vector>
 
 using namespace std;
 
@@ -62,10 +64,10 @@ void Utils::throwError(std::string message) {
     throw std::invalid_argument(message.c_str());
 }
 
-void Utils::Log(std::string message) {
+void Utils::Log(const std::string& message) {
     return Log(Utils::utf8_to_wstring(message));
 }
 
-void Utils::Log(std::wstring message) {
+void Utils::Log(const std::wstring& message) {
     std::wcout << message;
 }

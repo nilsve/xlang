@@ -30,14 +30,12 @@ void InstructionValidator::validateCallInstruction(const CallInstruction &callIn
         return;
     }
 
-    auto &modules = parser.getModules();
-    for (auto &module : modules) {
+    for (auto &module : parser.getModules()) {
         if (module->getModuleName() == callInstruction.moduleName) {
             if (!callInstruction.functionName.length()) {
                 return;
             }
-            auto &functions = module->getFunctions();
-            for (auto &function : functions) {
+            for (auto &function : module->getFunctions()) {
                 if (function->getFunctionName() == callInstruction.functionName) {
                     if (!callInstruction.scopeId.length()) {
                         return;

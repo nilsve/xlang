@@ -11,6 +11,7 @@
 #include "Variable.h"
 #include "../compiler/instructions/Instruction.h"
 #include "../../utils/Utils.h"
+#include "Data.h"
 
 #include <vector>
 #include <memory>
@@ -26,7 +27,7 @@ private:
     std::vector<std::unique_ptr<Scope>> scopes;
     std::vector<std::unique_ptr<Variable>> variables;
     std::vector<std::unique_ptr<Instruction>> instructions;
-    std::vector<std::unique_ptr<std::wstring>> stringConstants;
+    std::vector<std::unique_ptr<Data>> data;
 
     std::unique_ptr<Scope> parseNestedScope(TokenParser& parser);
     void parseFunctionCall(TokenParser& parser);
@@ -46,6 +47,10 @@ public:
     const Function *getParentFunction() const;
     const Scope *getParentScope() const;
     const std::vector<std::unique_ptr<Scope>> &getScopes() const;
+    const std::vector<std::unique_ptr<Variable>> &getVariables() const;
+
+    template <typename T>
+    const Data& upsertData(T search);
 };
 
 
