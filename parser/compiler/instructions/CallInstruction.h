@@ -21,7 +21,7 @@ public:
     CallInstruction(std::unique_ptr<Target> _target, std::vector<const Variable*> _parameters) : target(std::move(_target)), parameters(std::move(_parameters)) {}
     CallInstruction(std::unique_ptr<Target> _target) : target(std::move(_target)) {}
 
-    const Target* getTarget() const {
+    Target* getTarget() const {
         return target.get();
     }
 

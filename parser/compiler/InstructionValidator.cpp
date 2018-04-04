@@ -4,10 +4,13 @@
 
 #include "InstructionValidator.h"
 #include "WeakTarget.h"
+#include "instructions/JmpInstruction.h"
 
-void InstructionValidator::validateInstruction(const Instruction &instruction) const {
-    if (auto callInstruction = dynamic_cast<const CallInstruction *>(&instruction)) {
-        validateCallInstruction(*callInstruction);
+void InstructionValidator::validateAndPatchInstruction(Instruction &instruction) const {
+    if (auto callInstruction = dynamic_cast<CallInstruction *>(&instruction)) {
+        handleTarget(instruction, *callInstruction->getTarget());
+    } else if (auto jmpInstruction = dynamic_cast<JmpInstruction *>(&instruction)) {
+        handleTarget(instruction, *jmpInstruction->getTarget());
     }
 }
 
@@ -26,9 +29,9 @@ bool InstructionValidator::findScopeId(const Scope &rootScope, std::wstring scop
     return false;
 }
 
-void InstructionValidator::validateCallInstruction(const CallInstruction &callInstruction) const {
+void InstructionValidator::handleTarget(const Instruction &instruction, Target &target) const {
 
-    if (auto weakTarget = dynamic_cast<const WeakTarget*>(callInstruction.getTarget())) {
+    if (auto weakTarget = dynamic_cast<const WeakTarget*>(&target)) {
         if (!weakTarget->getModuleName().length()) {
             return;
         }
@@ -41,6 +44,22 @@ void InstructionValidator::validateCallInstruction(const CallInstruction &callIn
 
                 for (auto &function : module->getFunctions()) {
                     if (weakTarget->getFunctionName() == function->getFunctionName()) {
+                        target.setCallingConvention(function->getCallingConvention());
+
+                        if (auto callInstruction = dynamic_cast<const CallInstruction *>(&instruction)) {
+                            if (callInstruction->getParameters().size() != function->getParameters().size()) {
+                                Utils::throwError("Parameter count doesn't match!"); //TODO: Lijn etc
+                            } else {
+                                auto& arguments = callInstruction->getParameters();
+                                auto& parameters = function->getParameters();
+                                for (unsigned int i = 0; i < arguments.size(); i++) {
+                                    if (arguments[i]->getDataType() != parameters[i]->getDataType()) {
+                                        Utils::throwError(L"Invalid argument supplied to " + function->getFunctionName() + L". Expected " + parameters[i]->getDataType() + L", but got " + arguments[i]->getDataType());
+                                    }
+                                }
+                            }
+                        }
+
                         if (!weakTarget->getScopeId().length()) {
                             return;
                         }
@@ -53,7 +72,7 @@ void InstructionValidator::validateCallInstruction(const CallInstruction &callIn
             }
         }
 
-        Utils::throwError(L"Unknown function / scope " + callInstruction.getTarget()->getFullPath());
+        Utils::throwError(L"Unknown function / scope " + target.getFullPath());
     }
 
 }

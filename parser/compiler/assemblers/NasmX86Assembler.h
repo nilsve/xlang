@@ -14,7 +14,7 @@ public:
     std::wstring assembleInstruction(const Instruction &instruction) const override;
 
     std::wstring assembleFunctionStart(const Function &function) const override;
-    std::wstring assembleFunctionEnd() const override;
+    std::wstring assembleFunctionEnd(const Function& function) const override;
 
     std::wstring assembleData(const Data &data) const override;
 

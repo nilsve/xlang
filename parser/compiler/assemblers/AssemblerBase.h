@@ -13,7 +13,7 @@
 class AssemblerBase {
 public:
     virtual std::wstring assembleInstruction(const Instruction& instruction) const = 0;
-    virtual std::wstring assembleFunctionEnd() const = 0;
+    virtual std::wstring assembleFunctionEnd(const Function& function) const = 0;
     virtual std::wstring assembleScopeEnd(const Scope& scope) const = 0;
     virtual std::wstring assembleData(const Data& data) const = 0;
 

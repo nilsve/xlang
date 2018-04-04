@@ -11,18 +11,20 @@
 
 #include <iostream>
 
+class Target;
+
 class InstructionValidator {
     private:
         const Parser& parser;
 
         bool findScopeId(const Scope& rootScope, std::wstring scopeId) const;
 
-        void validateCallInstruction(const CallInstruction& callInstruction) const;
+        void handleTarget(const Instruction &instruction, Target& target) const;
 
     public:
         explicit InstructionValidator(const Parser& _parser) : parser(_parser) {}
 
-        void validateInstruction(const Instruction& instruction) const;
+        void validateAndPatchInstruction(Instruction& instruction) const;
 };
 
 #endif //XLANG_INSTRUCTIONVALIDATOR_H

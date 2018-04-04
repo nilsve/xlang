@@ -5,12 +5,11 @@
 #include "parser/compiler/Compiler.h"
 
 int main() {
-
-
     Parser parser(L"/Users/nils.van.eijk/Desktop/test/", L"main.x");
     parser.Parse();
 
     Compiler<NasmX86Assembler> compiler(parser);
+    compiler.setDataStorageMode(DataStorageMode::scope);
     std::wcout << compiler.Compile();
 
     return 0;

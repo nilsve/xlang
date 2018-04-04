@@ -18,8 +18,8 @@ private:
 public:
     explicit JmpInstruction(std::unique_ptr<Target> _target) : target(std::move(_target)) {}
 
-    std::wstring getTarget() const {
-        return target->getFullPath();
+    Target* getTarget() const {
+        return target.get();
     }
 };
 

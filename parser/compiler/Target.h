@@ -9,8 +9,15 @@
 #include "../interpreter/Function.h"
 
 class Target : public non_copyable {
+private:
+    CallingConvention callingConvention;
 public:
     virtual std::wstring getModuleName() const = 0;
+
+    CallingConvention getCallingConvention() const;
+
+    void setCallingConvention(CallingConvention callingConvention);
+
     virtual std::wstring getFunctionName() const = 0;
     virtual std::wstring getScopeId() const = 0;
 

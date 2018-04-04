@@ -20,7 +20,7 @@
 
 template <typename Assembler>
 class Compiler : public non_copyable {
-    static_assert(std::is_base_of<AssemblerBase, Assembler>::value, "Assembler has to be derrived from AssemblerBase");
+    static_assert(std::is_base_of<AssemblerBase, Assembler>::value, "Assembler has to be derived from AssemblerBase");
 private:
     const Parser& parser;
     const std::unique_ptr<InstructionValidator> validator;
@@ -30,7 +30,7 @@ private:
     std::vector<std::wstring> code;
     std::vector<std::wstring> data;
 
-    const Module* findModule(const std::vector<std::unique_ptr<Module>>& modules, std::wstring moduleName) const {
+    const Module* findModule(const std::vector<std::unique_ptr<Module>>& modules, const std::wstring& moduleName) const {
         for (auto& module : modules) {
             if (module->getModuleName() == moduleName) {
                 return module.get();
@@ -40,7 +40,7 @@ private:
         return nullptr;
     }
 
-    const Function* findFunction(const Module& module, std::wstring functionName) const {
+    const Function* findFunction(const Module& module, const std::wstring& functionName) const {
         for (auto& function : module.getFunctions()) {
             if (function->getFunctionName() == functionName) {
                 return function.get();
@@ -60,18 +60,22 @@ private:
 
                 compileScope(*function->getRootScope());
 
-                appendCodeBlock(assembler.assembleFunctionEnd());
+                appendCodeBlock(assembler.assembleFunctionEnd(*function));
             }
         }
     }
 
     void compileScope(const Scope &scope) {
 
+        for (auto& data : scope.getData()) {
+            compileData(*data);
+        }
+
         std::wstring scopeCode;
         scopeCode += assembler.assembleScopeStart(scope) + L"\n";
 
         for (auto& instruction : scope.getInstructions()) {
-            validator->validateInstruction(*instruction);
+            validator->validateAndPatchInstruction(*instruction);
             scopeCode += assembler.assembleInstruction(*instruction) + L"\n";
         }
 
@@ -87,13 +91,14 @@ private:
     }
 
     void compileData(const Data& data) {
-        auto result = assembler->compileData(data);
+        auto result = assembler.assembleData(data);
 
         switch (dataStorageMode) {
             case DataStorageMode::section:
-
+                appendDataBlock(std::move(result));
                 break;
             case DataStorageMode::scope:
+                appendCodeBlock(std::move(result));
                 break;
             default:
                 assert(false);

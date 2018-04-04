@@ -155,7 +155,7 @@ void Scope::updateVariable(TokenParser &parser, const Variable& variable) {
 
     if (token.isStringLiteral) {
         _data = &upsertData(token.token);
-    } else {
+    } else if (auto variable = getVariable(token)) {
         assert(false); // Not implemented!
     }
 
@@ -212,4 +212,8 @@ unsigned int Scope::calculateVariableIndex() const {
     }
 
     return index;
+}
+
+const vector<unique_ptr<Data>> &Scope::getData() const {
+    return data;
 }

@@ -14,29 +14,35 @@ const unsigned long REGISTER_SIZE = 4;
 std::wstring NasmX86Assembler::assembleInstruction(const Instruction& instruction) const {
     if (auto callInstruction = dynamic_cast<const CallInstruction*>(&instruction)) {
 
-        for (auto& parameter : callInstruction->getParameters()) {
+        auto target = callInstruction->getTarget();
+        std::wstring result;
 
+        for (auto& parameter : callInstruction->getParameters()) {
+            result += L"push DWORD [ebp + " + std::to_wstring(parameter->getVariableIndex()) + L"]\n";
         }
 
-        return L"call " + callInstruction->getTarget()->getFullPath();
+        return result + L"call " + target->getFullPath();
     } else if (auto assignInstruction = dynamic_cast<const AssignInstruction*>(&instruction)) {
 
         if (auto target = assignInstruction->getTarget()) {
-            return L"mov [ebp + " + std::to_wstring(target->getVariableIndex() * REGISTER_SIZE) + L"], 0";
+            if (auto data = assignInstruction->getData()) {
+                return  L"mov DWORD eax, " + data->getDataId() + L"\n"
+                        L"mov DWORD [ebp + " + std::to_wstring(target->getVariableIndex() * REGISTER_SIZE) + L"], eax";
+            }
         } else {
             Utils::throwError("Target empty for assignment instruction!");
         }
     } else if (auto jmpInstruction = dynamic_cast<const JmpInstruction*>(&instruction)) {
-        return L"jmp " + jmpInstruction->getTarget();
+        return L"jmp " + jmpInstruction->getTarget()->getFullPath();
     }
 
     throw std::invalid_argument("Instruction not implemented!");
 }
 
-std::wstring NasmX86Assembler::assembleFunctionEnd() const {
+std::wstring NasmX86Assembler::assembleFunctionEnd(const Function& function) const {
     return  L"mov esp, ebp\n"
             L"pop ebp\n"
-            L"ret";
+            L"ret " + (function.getCallingConvention() == CallingConvention::cdecl ? std::to_wstring(function.getParameters().size() * REGISTER_SIZE) : L"");
 }
 
 std::wstring NasmX86Assembler::assembleScopeStart(const Scope &scope) const {
@@ -79,5 +85,7 @@ std::wstring NasmX86Assembler::assembleData(const Data &data) const {
     for (auto chr : data.getData()) {
         result += chr;
     }
+
+    return result;
 }
 

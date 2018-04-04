@@ -48,6 +48,8 @@ public:
     const std::vector<std::unique_ptr<Scope>> &getScopes() const;
     const std::vector<std::unique_ptr<Variable>> &getVariables() const;
 
+    const std::vector<std::unique_ptr<Data>> &getData() const;
+
     template <typename T>
     const Data& upsertData(T search);
 };

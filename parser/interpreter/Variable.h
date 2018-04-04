@@ -38,6 +38,8 @@ public:
 
     void setVariableIndex(int variableIndex);
     int getVariableIndex() const;
+
+    const std::wstring &getDataType() const;
 };
 
 

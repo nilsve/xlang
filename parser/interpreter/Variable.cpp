@@ -115,3 +115,7 @@ void Variable::setVariableIndex(int variableIndex) {
 int Variable::getVariableIndex() const {
     return variableIndex;
 }
+
+const wstring &Variable::getDataType() const {
+    return dataType;
+}
