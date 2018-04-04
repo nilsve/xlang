@@ -12,17 +12,22 @@
 #include <vector>
 #include <string>
 
+enum class DataStorageMode {
+    scope,
+    section,
+};
+
 class Data : public non_copyable {
 private:
+    static unsigned long highestDataId;
+    const std::wstring dataId;
     std::vector<unsigned char> data;
 
+    static std::wstring getUniqueDataId();
 public:
-    Data& operator =(const std::wstring& str) {
-        auto utf8Str = Utils::wstring_to_utf8(str);
+    Data() : dataId(Data::getUniqueDataId()) {}
 
-        data.insert(data.begin(), utf8Str.begin(), utf8Str.end());
-        return *this;
-    }
+    Data& operator =(const std::wstring& str);
 
     template <typename T>
     bool operator ==(const T& other) const {
@@ -39,28 +44,11 @@ public:
         return true;
     }
 
-    bool operator ==(const Data& other) const {
+    bool operator ==(const Data& other) const;
+    bool operator != (const Data& other) const;
 
-        if (other.data.size() != data.size()) {
-            return false;
-        } else {
-            for (unsigned long i = 0; i < data.size(); i++) {
-                if (data[i] != other.data[i]) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    bool operator != (const Data& other) const {
-        return !(other == *this);
-    }
-
-    const std::vector<unsigned char> &getData() const {
-        return data;
-    }
+    const std::vector<unsigned char> &getData() const;
+    const std::wstring& getDataId() const;
 };
 
 

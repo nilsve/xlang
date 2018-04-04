@@ -8,6 +8,9 @@
 #include "Module.h"
 #include "Data.h"
 #include "../compiler/instructions/AssignInstruction.h"
+#include "../compiler/StrongTarget.h"
+#include "../compiler/WeakTarget.h"
+#include "../compiler/Target.h"
 
 #include <cassert>
 #include <iostream>
@@ -23,11 +26,7 @@ void Scope::Parse(TokenParser &parser) {
         if (token == L"{") {
             auto scope = parseNestedScope(parser);
 
-            auto moduleName = scope->getParentFunction()->getParent()->getModuleName();
-            auto functionName = scope->getParentFunction()->getFunctionName();
-            auto scopeId = scope->getScopeId();
-
-            auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(std::move(moduleName), std::move(functionName), std::move(scopeId))));
+            auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(unique_ptr<Target>(new StrongTarget(*scope)))));
             instructions.emplace_back(std::move(call));
 
             scopes.push_back(std::move(scope));
@@ -102,7 +101,7 @@ void Scope::parseFunctionCall(TokenParser& parser) {
         parser.throwError("Expected ; after function call!");
     }
 
-    auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(std::move(moduleName), std::move(functionName), L"", std::move(arguments))));
+    auto call = unique_ptr<Instruction>((Instruction*)(new CallInstruction(unique_ptr<Target>((Target*)(new WeakTarget(moduleName, functionName))), std::move(arguments))));
 
     instructions.emplace_back(std::move(call));
 }

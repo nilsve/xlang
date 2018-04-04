@@ -15,6 +15,7 @@ public:
     virtual std::wstring assembleInstruction(const Instruction& instruction) const = 0;
     virtual std::wstring assembleFunctionEnd() const = 0;
     virtual std::wstring assembleScopeEnd(const Scope& scope) const = 0;
+    virtual std::wstring assembleData(const Data& data) const = 0;
 
     virtual std::wstring assembleFunctionStart(const Function & function) const {
         return function.getParent()->getModuleName() + L"_" + function.getFunctionName() + L":";

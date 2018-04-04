@@ -3,6 +3,7 @@
 //
 
 #include "InstructionValidator.h"
+#include "WeakTarget.h"
 
 void InstructionValidator::validateInstruction(const Instruction &instruction) const {
     if (auto callInstruction = dynamic_cast<const CallInstruction *>(&instruction)) {
@@ -26,33 +27,33 @@ bool InstructionValidator::findScopeId(const Scope &rootScope, std::wstring scop
 }
 
 void InstructionValidator::validateCallInstruction(const CallInstruction &callInstruction) const {
-    if (!callInstruction.moduleName.length()) {
-        return;
-    }
 
-    for (auto &module : parser.getModules()) {
-        if (module->getModuleName() == callInstruction.moduleName) {
-            if (!callInstruction.functionName.length()) {
-                return;
-            }
-            for (auto &function : module->getFunctions()) {
-                if (function->getFunctionName() == callInstruction.functionName) {
-                    if (!callInstruction.scopeId.length()) {
-                        return;
+    if (auto weakTarget = dynamic_cast<const WeakTarget*>(callInstruction.getTarget())) {
+        if (!weakTarget->getModuleName().length()) {
+            return;
+        }
+
+        for (auto &module : parser.getModules()) {
+            if (module->getModuleName() == weakTarget->getModuleName()) {
+                if (!weakTarget->getFunctionName().length()) {
+                    return;
+                }
+
+                for (auto &function : module->getFunctions()) {
+                    if (weakTarget->getFunctionName() == function->getFunctionName()) {
+                        if (!weakTarget->getScopeId().length()) {
+                            return;
+                        }
+
+                        if (findScopeId(*function->getRootScope(), weakTarget->getScopeId())) {
+                            return;
+                        }
                     }
-
-                    if (findScopeId(*function->getRootScope(), callInstruction.scopeId)) {
-                        return;
-                    }
-
-                    break;
                 }
             }
-
-            break;
         }
-    }
 
-    Utils::throwError(L"Unknown function / scope " + callInstruction.getTarget());
+        Utils::throwError(L"Unknown function / scope " + callInstruction.getTarget()->getFullPath());
+    }
 
 }

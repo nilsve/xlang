@@ -6,17 +6,20 @@
 #define XLANG_JMPINSTRUCTION_H
 
 #include "Instruction.h"
+#include "../Target.h"
 
 #include <memory>
 
+class Scope;
+
 class JmpInstruction : public Instruction {
 private:
-    const Instruction* targetScope;
+    std::unique_ptr<Target> target;
 public:
-    explicit JmpInstruction(Instruction* _targetScope) : targetScope(_targetScope) {}
+    explicit JmpInstruction(std::unique_ptr<Target> _target) : target(std::move(_target)) {}
 
-    const Instruction *getTargetScope() const {
-        return targetScope;
+    std::wstring getTarget() const {
+        return target->getFullPath();
     }
 };
 

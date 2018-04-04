@@ -16,6 +16,8 @@ public:
     std::wstring assembleFunctionStart(const Function &function) const override;
     std::wstring assembleFunctionEnd() const override;
 
+    std::wstring assembleData(const Data &data) const override;
+
     std::wstring assembleScopeStart(const Scope &scope) const override;
     std::wstring assembleScopeEnd(const Scope& scope) const override;
 

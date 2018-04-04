@@ -10,6 +10,8 @@
 #include "../../utils/Utils.h"
 #include "./assemblers/AssemblerBase.h"
 #include "InstructionValidator.h"
+#include "instructions/JmpInstruction.h"
+#include "StrongTarget.h"
 
 #include <vector>
 #include <type_traits>
@@ -23,8 +25,10 @@ private:
     const Parser& parser;
     const std::unique_ptr<InstructionValidator> validator;
     Assembler assembler;
+    DataStorageMode dataStorageMode = DataStorageMode::section;
 
-    std::wstring output;
+    std::vector<std::wstring> code;
+    std::vector<std::wstring> data;
 
     const Module* findModule(const std::vector<std::unique_ptr<Module>>& modules, std::wstring moduleName) const {
         for (auto& module : modules) {
@@ -35,6 +39,7 @@ private:
 
         return nullptr;
     }
+
     const Function* findFunction(const Module& module, std::wstring functionName) const {
         for (auto& function : module.getFunctions()) {
             if (function->getFunctionName() == functionName) {
@@ -48,22 +53,31 @@ private:
     void compileModules(const std::vector<std::unique_ptr<Module>> &modules) {
         for (auto& module : modules) {
             for (auto& function : module->getFunctions()) {
-                appendOutput(assembler.assembleFunctionStart(*function));
+
+                StrongTarget target(*function->getRootScope());
+                JmpInstruction jmp(std::unique_ptr<Target>((Target*)(new StrongTarget(*function->getRootScope()))));
+                appendCodeBlock(assembler.assembleFunctionStart(*function) + L"\n" + assembler.assembleInstruction(jmp));
 
                 compileScope(*function->getRootScope());
 
-                appendOutput(assembler.assembleFunctionEnd());
+                appendCodeBlock(assembler.assembleFunctionEnd());
             }
         }
     }
 
     void compileScope(const Scope &scope) {
-        appendOutput(assembler.assembleScopeStart(scope));
+
+        std::wstring scopeCode;
+        scopeCode += assembler.assembleScopeStart(scope) + L"\n";
 
         for (auto& instruction : scope.getInstructions()) {
             validator->validateInstruction(*instruction);
-            appendOutput(assembler.assembleInstruction(*instruction));
+            scopeCode += assembler.assembleInstruction(*instruction) + L"\n";
         }
+
+        scopeCode += assembler.assembleScopeEnd(scope);
+
+        appendCodeBlock(scopeCode);
 
         auto& childScopes = scope.getScopes();
 
@@ -72,13 +86,31 @@ private:
         }
     }
 
-    void appendOutput(std::wstring line) {
-        output += line + L"\n";
+    void compileData(const Data& data) {
+        auto result = assembler->compileData(data);
+
+        switch (dataStorageMode) {
+            case DataStorageMode::section:
+
+                break;
+            case DataStorageMode::scope:
+                break;
+            default:
+                assert(false);
+        }
+    }
+
+    void appendDataBlock(std::wstring _data) {
+        data.push_back(std::move(_data));
+    }
+
+    void appendCodeBlock(std::wstring _code) {
+        code.push_back(std::move(_code));
     }
 
 public:
     explicit Compiler(const Parser& _parser) : parser(_parser), validator(std::make_unique<InstructionValidator>(parser)) {
-        output.reserve(2048);
+        code.reserve(2048);
     }
 
     std::wstring Compile() {
@@ -92,7 +124,22 @@ public:
             }
         }
 
-        return std::move(output);
+        std::wstring result;
+        unsigned long size = 0;
+        for (std::wstring& block : code) {
+            size += block.size();
+        }
+
+        result.reserve(size);
+        for (std::wstring& block : code) {
+            result += block + L"\n";
+        }
+
+        return result;
+    }
+
+    void setDataStorageMode(DataStorageMode dataStorageMode) {
+        Compiler::dataStorageMode = dataStorageMode;
     }
 };
 

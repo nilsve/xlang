@@ -8,38 +8,21 @@
 
 #include "Instruction.h"
 #include "../../interpreter/Variable.h"
+#include "../Target.h"
 
 #include <memory>
 #include <vector>
 
 class CallInstruction : public Instruction {
-public:
-    const std::wstring moduleName;
-    const std::wstring functionName;
-    const std::wstring scopeId;
+private:
+    const std::unique_ptr<Target> target;
     const std::vector<const Variable*> parameters;
+public:
+    CallInstruction(std::unique_ptr<Target> _target, std::vector<const Variable*> _parameters) : target(std::move(_target)), parameters(std::move(_parameters)) {}
+    CallInstruction(std::unique_ptr<Target> _target) : target(std::move(_target)) {}
 
-    CallInstruction(std::wstring _moduleName, std::wstring _functionName, std::wstring _scopeId, std::vector<const Variable*> _parameters) : moduleName(std::move(_moduleName)),
-                                                                                                                                             functionName(std::move(_functionName)),
-                                                                                                                                             scopeId(std::move(_scopeId)),
-                                                                                                                                             parameters(std::move(_parameters)) {}
-    CallInstruction(std::wstring _moduleName, std::wstring _functionName, std::wstring _scopeId) : moduleName(std::move(_moduleName)),
-                                                                                                   functionName(std::move(_functionName)),
-                                                                                                   scopeId(std::move(_scopeId)) {}
-
-    std::wstring getTarget() const {
-        std::wstring target;
-        if (moduleName.length()) {
-            target += moduleName;
-        }
-        if (functionName.length()) {
-            target += L"_" + functionName;
-        }
-        if (scopeId.length()) {
-            target += L"_" + scopeId;
-        }
-
-        return target;
+    const Target* getTarget() const {
+        return target.get();
     }
 
     const std::vector<const Variable *> &getParameters() const {
