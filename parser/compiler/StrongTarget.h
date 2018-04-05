@@ -10,42 +10,57 @@
 
 #include <string>
 
-enum class StrongTargetType {
-    scope,
-    function,
-};
+namespace xlang {
 
-class Scope;
-class Function;
-
-class StrongTarget : public Target {
-private:
-    StrongTargetType type;
-    union {
-        const Scope* scope;
-        const Function* function;
-    } target;
-
-    const Function& getFunction() const;
-
-    std::wstring getPath(const Scope *scope) const;
-    std::wstring getPath(const Function *function) const;
-public:
-    explicit StrongTarget(const Scope& scope) {
-        type = StrongTargetType::scope;
-        target.scope = &scope;
+    namespace interpreter {
+        class Scope;
+        class Function;
     }
 
-    explicit StrongTarget(const Function& function) {
-        type = StrongTargetType::function;
-        target.function = &function;
-    }
+    namespace compiler {
 
-    std::wstring getModuleName() const override;
-    std::wstring getFunctionName() const override;
-    std::wstring getScopeId() const override;
-    std::wstring getFullPath() const override;
-};
+        enum class StrongTargetType {
+            scope,
+            function,
+        };
+
+
+
+        class StrongTarget : public Target {
+        private:
+            StrongTargetType type;
+            union {
+                const interpreter::Scope *scope;
+                const interpreter::Function *function;
+            } target;
+
+            const interpreter::Function &getFunction() const;
+
+            std::wstring getPath(const interpreter::Scope *scope) const;
+
+            std::wstring getPath(const interpreter::Function *function) const;
+
+        public:
+            explicit StrongTarget(const interpreter::Scope &scope) {
+                type = StrongTargetType::scope;
+                target.scope = &scope;
+            }
+
+            explicit StrongTarget(const interpreter::Function &function) {
+                type = StrongTargetType::function;
+                target.function = &function;
+            }
+
+            std::wstring getModuleName() const override;
+
+            std::wstring getFunctionName() const override;
+
+            std::wstring getScopeId() const override;
+
+            std::wstring getFullPath() const override;
+        };
+    }
+}
 
 
 #endif //XLANG_STRONGTARGET_H

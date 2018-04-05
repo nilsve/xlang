@@ -4,42 +4,49 @@
 
 #include "Data.h"
 
-unsigned long Data::highestDataId = 0;
+namespace xlang {
+    namespace interpreter {
 
-Data& Data::operator=(const std::wstring& str) {
-    auto utf8Str = Utils::wstring_to_utf8(str);
+        using namespace utils;
 
-    data.insert(data.begin(), utf8Str.begin(), utf8Str.end());
-    return *this;
-}
+        unsigned long Data::highestDataId = 0;
 
-bool Data::operator ==(const Data& other) const {
+        Data &Data::operator=(const std::wstring &str) {
+            auto utf8Str = Utils::wstring_to_utf8(str);
 
-    if (other.data.size() != data.size()) {
-        return false;
-    } else {
-        for (unsigned long i = 0; i < data.size(); i++) {
-            if (data[i] != other.data[i]) {
+            data.insert(data.begin(), utf8Str.begin(), utf8Str.end());
+            return *this;
+        }
+
+        bool Data::operator==(const Data &other) const {
+
+            if (other.data.size() != data.size()) {
                 return false;
+            } else {
+                for (unsigned long i = 0; i < data.size(); i++) {
+                    if (data[i] != other.data[i]) {
+                        return false;
+                    }
+                }
             }
+
+            return true;
+        }
+
+        bool Data::operator!=(const Data &other) const {
+            return !(other == *this);
+        }
+
+        const std::vector<unsigned char> &Data::getData() const {
+            return data;
+        }
+
+        std::wstring Data::getUniqueDataId() {
+            return L"d_" + std::to_wstring(highestDataId++);
+        }
+
+        const std::wstring &Data::getDataId() const {
+            return dataId;
         }
     }
-
-    return true;
-}
-
-bool Data::operator != (const Data& other) const {
-    return !(other == *this);
-}
-
-const std::vector<unsigned char> &Data::getData() const {
-    return data;
-}
-
-std::wstring Data::getUniqueDataId() {
-    return L"d_" + std::to_wstring(highestDataId++);
-}
-
-const std::wstring& Data::getDataId() const {
-    return dataId;
 }

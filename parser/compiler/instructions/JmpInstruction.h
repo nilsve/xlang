@@ -10,18 +10,21 @@
 
 #include <memory>
 
-class Scope;
+namespace xlang {
+    namespace compiler {
+        namespace instructions {
+            class JmpInstruction : public Instruction {
+            private:
+                std::unique_ptr<Target> target;
+            public:
+                explicit JmpInstruction(std::unique_ptr<Target> _target) : target(std::move(_target)) {}
 
-class JmpInstruction : public Instruction {
-private:
-    std::unique_ptr<Target> target;
-public:
-    explicit JmpInstruction(std::unique_ptr<Target> _target) : target(std::move(_target)) {}
-
-    Target* getTarget() const {
-        return target.get();
+                Target *getTarget() const {
+                    return target.get();
+                }
+            };
+        }
     }
-};
-
+}
 
 #endif //XLANG_JMPINSTRUCTION_H

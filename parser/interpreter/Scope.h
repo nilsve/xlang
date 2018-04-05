@@ -7,7 +7,7 @@
 
 
 #include "../../utils/non_copyable.h"
-#include "../TokenParser.h"
+#include "TokenParser.h"
 #include "Variable.h"
 #include "../compiler/instructions/Instruction.h"
 #include "../../utils/Utils.h"
@@ -16,43 +16,59 @@
 #include <vector>
 #include <memory>
 
-class Function;
+namespace xlang {
+    namespace interpreter {
 
-class Scope : public non_copyable {
-private:
-    const std::wstring scopeId;
-    const Function* parentFunction = nullptr;
-    const Scope* parentScope = nullptr;
+        class Function;
 
-    std::vector<std::unique_ptr<Scope>> scopes;
-    std::vector<std::unique_ptr<Variable>> variables;
-    std::vector<std::unique_ptr<Instruction>> instructions;
-    std::vector<std::unique_ptr<Data>> data;
+        class Scope : public utils::non_copyable {
+        private:
+            const std::wstring scopeId;
+            const Function *parentFunction = nullptr;
+            const Scope *parentScope = nullptr;
 
-    std::unique_ptr<Scope> parseNestedScope(TokenParser& parser);
-    void parseFunctionCall(TokenParser& parser);
-    void declareVariable(TokenParser &parser);
-    void updateVariable(TokenParser &parser, const Variable& variable);
+            std::vector<std::unique_ptr<Scope>> scopes;
+            std::vector<std::unique_ptr<Variable>> variables;
+            std::vector<std::unique_ptr<compiler::instructions::Instruction>> instructions;
+            std::vector<std::unique_ptr<Data>> data;
 
-    const Variable* getVariable(const Token &token) const;
-    unsigned int calculateVariableIndex() const;
-public:
-    Scope(const Function* _parentFunction, const Scope* _parentScope) : scopeId(Utils::generateUuid()), parentFunction(_parentFunction), parentScope(_parentScope) {}
-    void Parse(TokenParser& parser);
+            std::unique_ptr<Scope> parseNestedScope(TokenParser &parser);
 
-    const std::vector<std::unique_ptr<Instruction>> &getInstructions() const;
+            void parseFunctionCall(TokenParser &parser);
 
-    const std::wstring &getScopeId() const;
-    const Function *getParentFunction() const;
-    const Scope *getParentScope() const;
-    const std::vector<std::unique_ptr<Scope>> &getScopes() const;
-    const std::vector<std::unique_ptr<Variable>> &getVariables() const;
+            void declareVariable(TokenParser &parser);
 
-    const std::vector<std::unique_ptr<Data>> &getData() const;
+            void updateVariable(TokenParser &parser, const Variable &variable);
 
-    template <typename T>
-    const Data& upsertData(T search);
-};
+            const Variable *getVariable(const Token &token) const;
 
+            unsigned int calculateVariableIndex() const;
+
+        public:
+            Scope(const Function *_parentFunction, const Scope *_parentScope) : scopeId(utils::Utils::generateUuid()),
+                                                                                parentFunction(_parentFunction),
+                                                                                parentScope(_parentScope) {}
+
+            void Parse(TokenParser &parser);
+
+            const std::vector<std::unique_ptr<compiler::instructions::Instruction>> &getInstructions() const;
+
+            const std::wstring &getScopeId() const;
+
+            const Function *getParentFunction() const;
+
+            const Scope *getParentScope() const;
+
+            const std::vector<std::unique_ptr<Scope>> &getScopes() const;
+
+            const std::vector<std::unique_ptr<Variable>> &getVariables() const;
+
+            const std::vector<std::unique_ptr<Data>> &getData() const;
+
+            template<typename T>
+            const Data &upsertData(T search);
+        };
+    }
+}
 
 #endif //XLANG_SCOPE_H

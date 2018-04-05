@@ -12,44 +12,51 @@
 #include <vector>
 #include <string>
 
-enum class DataStorageMode {
-    scope,
-    section,
-};
+namespace xlang {
+    namespace interpreter {
 
-class Data : public non_copyable {
-private:
-    static unsigned long highestDataId;
-    const std::wstring dataId;
-    std::vector<unsigned char> data;
+        enum class DataStorageMode {
+            scope,
+            section,
+        };
 
-    static std::wstring getUniqueDataId();
-public:
-    Data() : dataId(Data::getUniqueDataId()) {}
+        class Data : public utils::non_copyable {
+        private:
+            static unsigned long highestDataId;
+            const std::wstring dataId;
+            std::vector<unsigned char> data;
 
-    Data& operator =(const std::wstring& str);
+            static std::wstring getUniqueDataId();
 
-    template <typename T>
-    bool operator ==(const T& other) const {
-        if (other.size() != data.size()) {
-            return false;
-        } else {
-            for (unsigned long i = 0; i < data.size(); i++) {
-                if (data[i] != other[i]) {
+        public:
+            Data() : dataId(Data::getUniqueDataId()) {}
+
+            Data &operator=(const std::wstring &str);
+
+            template<typename T>
+            bool operator==(const T &other) const {
+                if (other.size() != data.size()) {
                     return false;
+                } else {
+                    for (unsigned long i = 0; i < data.size(); i++) {
+                        if (data[i] != other[i]) {
+                            return false;
+                        }
+                    }
                 }
+
+                return true;
             }
-        }
 
-        return true;
+            bool operator==(const Data &other) const;
+
+            bool operator!=(const Data &other) const;
+
+            const std::vector<unsigned char> &getData() const;
+
+            const std::wstring &getDataId() const;
+        };
     }
-
-    bool operator ==(const Data& other) const;
-    bool operator != (const Data& other) const;
-
-    const std::vector<unsigned char> &getData() const;
-    const std::wstring& getDataId() const;
-};
-
+}
 
 #endif //XLANG_DATA_H

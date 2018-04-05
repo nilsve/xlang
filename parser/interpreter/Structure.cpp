@@ -3,3 +3,9 @@
 //
 
 #include "Structure.h"
+
+namespace xlang {
+    namespace interpreter {
+
+    }
+}

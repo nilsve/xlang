@@ -4,29 +4,33 @@
 
 #include "WeakTarget.h"
 
-std::wstring WeakTarget::getModuleName() const {
-    return moduleName;
-}
+namespace xlang {
+    namespace compiler {
+        std::wstring WeakTarget::getModuleName() const {
+            return moduleName;
+        }
 
-std::wstring WeakTarget::getFunctionName() const {
-    return functionName;
-}
+        std::wstring WeakTarget::getFunctionName() const {
+            return functionName;
+        }
 
-std::wstring WeakTarget::getScopeId() const {
-    return scopeId;
-}
+        std::wstring WeakTarget::getScopeId() const {
+            return scopeId;
+        }
 
-std::wstring WeakTarget::getFullPath() const {
-    std::wstring target;
-    if (moduleName.length()) {
-        target += moduleName;
+        std::wstring WeakTarget::getFullPath() const {
+            std::wstring target;
+            if (moduleName.length()) {
+                target += moduleName;
+            }
+            if (functionName.length()) {
+                target += L"_" + functionName;
+            }
+            if (scopeId.length()) {
+                target += L"_" + scopeId;
+            }
+
+            return target;
+        }
     }
-    if (functionName.length()) {
-        target += L"_" + functionName;
-    }
-    if (scopeId.length()) {
-        target += L"_" + scopeId;
-    }
-
-    return target;
 }

@@ -10,10 +10,14 @@
 
 #include <string>
 
-class Structure : public non_copyable {
-    std::wstring structureName;
+namespace xlang {
+    namespace interpreter {
 
-};
+        class Structure : public utils::non_copyable {
+            std::wstring structureName;
 
+        };
+    }
+}
 
 #endif //XLANG_STRUCTURE_H

@@ -8,10 +8,16 @@
 
 #include "../../../utils/non_copyable.h"
 
-class Instruction : public non_copyable {
-public:
-    virtual ~Instruction() = default;
-};
+namespace xlang {
+    namespace compiler {
+        namespace instructions {
 
+            class Instruction : public utils::non_copyable {
+            public:
+                virtual ~Instruction() = default;
+            };
+        }
+    }
+}
 
 #endif //XLANG_INSTRUCTION_H

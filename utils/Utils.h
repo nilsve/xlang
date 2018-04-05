@@ -8,24 +8,32 @@
 #include <string>
 #include <vector>
 
-class Utils {
-private:
-    Utils() = default;
-public:
-    static std::wstring readFile(const std::wstring& fileName);
+namespace xlang {
+    namespace utils {
 
-    static bool stringReplace(std::wstring &str, const std::wstring &from, const std::wstring &to);
+        class Utils {
+        private:
+            Utils() = default;
 
-    static std::string wstring_to_utf8 (const std::wstring& str);
-    static std::wstring utf8_to_wstring (const std::string& str);
-    static std::wstring generateUuid(unsigned int length = 5);
+        public:
+            static std::wstring readFile(const std::wstring &fileName);
 
-    static void Log(const std::wstring& message);
-    static void Log(const std::string& message);
+            static bool stringReplace(std::wstring &str, const std::wstring &from, const std::wstring &to);
 
-    static void throwError(std::wstring message);
-    static void throwError(std::string message);
-};
+            static std::string wstring_to_utf8(const std::wstring &str);
 
+            static std::wstring utf8_to_wstring(const std::string &str);
 
+            static std::wstring generateUuid(unsigned int length = 5);
+
+            static void Log(const std::wstring &message);
+
+            static void Log(const std::string &message);
+
+            static void throwError(std::wstring message);
+
+            static void throwError(std::string message);
+        };
+    }
+}
 #endif //XLANG_UTILS_H

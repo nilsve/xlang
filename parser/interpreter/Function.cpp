@@ -6,106 +6,105 @@
 
 #include <cassert>
 
-using namespace std;
+namespace xlang {
+    namespace interpreter {
 
-void Function::Parse(TokenParser &parser) {
-    parseHeader(parser);
-    parseBody(parser);
-}
+        using namespace std;
 
-void Function::parseHeader(TokenParser& parser) {
-    assert(parser.getToken() == L"function");
-
-    auto functionName = parser.getToken();
-    this->functionName = functionName.token;
-
-    auto token = parser.getToken();
-
-    if (token != L"(") {
-        CallingConvention convention = getCallingConvention(token.token);
-        if (convention != CallingConvention::unknown) {
-            callingConvention = convention;
-        } else {
-            parser.throwError("Unexpected token after function name!");
+        void Function::Parse(TokenParser &parser) {
+            parseHeader(parser);
+            parseBody(parser);
         }
 
-        token = parser.getToken();
-    }
+        void Function::parseHeader(TokenParser &parser) {
+            assert(parser.getToken() == L"function");
 
-    if (token != L"(") {
-        parser.throwError("Expected (");
-    }
+            auto functionName = parser.getToken();
+            this->functionName = functionName.token;
 
-    bool firstToken = true;
+            auto token = parser.getToken();
 
-    if (parser.peekToken(false) != L")") {
-        while (token != L")") {
-            // Handle parameters
-
-            auto parameter = Variable::parseFunctionArg(parser);
-            parameters.push_back(std::move(parameter));
-
-            token = parser.getToken();
-
-            if (!firstToken) {
-                // comma expected
-                if (token != L",") {
-                    parser.throwError("Comma expected");
+            if (token != L"(") {
+                CallingConvention convention = getCallingConvention(token.token);
+                if (convention != CallingConvention::unknown) {
+                    callingConvention = convention;
+                } else {
+                    parser.throwError("Unexpected token after function name!");
                 }
 
                 token = parser.getToken();
-
             }
-            firstToken = false;
+
+            if (token != L"(") {
+                parser.throwError("Expected (");
+            }
+
+            if (parser.peekToken(false) != L")") {
+                while (token != L")") {
+                    // Handle parameters
+
+                    auto parameter = Variable::parseFunctionArg(parser);
+                    parameter->setVariableIndex((parameters.size() + 1) * -1);
+                    parameters.push_back(std::move(parameter));
+
+                    token = parser.getToken();
+
+                    // comma expected
+                    if (token != L",") {
+                        break;
+                    }
+
+                }
+            } else {
+                parser.eatToken();
+            }
+
+            token = parser.peekToken();
+
+            if (token == L":") {
+                // Return type
+                parser.eatToken();
+                token = parser.getToken();
+            }
         }
-    } else {
-        parser.eatToken();
+
+        void Function::parseBody(TokenParser &parser) {
+            rootScope = make_unique<Scope>(this, nullptr);
+            rootScope->Parse(parser);
+        }
+
+        CallingConvention Function::getCallingConvention(const std::wstring &convention) {
+            if (convention == L"cdecl") {
+                return CallingConvention::cdecl;
+            } else if (convention == L"stdcall") {
+                return CallingConvention::stdcall;
+            } else {
+                return CallingConvention::unknown;
+            }
+        }
+
+        const wstring &Function::getFunctionName() const {
+            return functionName;
+        }
+
+        CallingConvention Function::getCallingConvention() const {
+            return callingConvention;
+        }
+
+        const vector<unique_ptr<Variable>> &Function::getParameters() const {
+            return parameters;
+        }
+
+        const unique_ptr<Variable> &Function::getReturnVariable() const {
+            return returnVariable;
+        }
+
+        const unique_ptr<Scope> &Function::getRootScope() const {
+            return rootScope;
+        }
+
+        const Module *Function::getParent() const {
+            return parent;
+        }
     }
-
-    token = parser.peekToken();
-
-    if (token == L":") {
-        // Return type
-        parser.eatToken();
-        token = parser.getToken();
-    }
-}
-
-void Function::parseBody(TokenParser& parser) {
-    rootScope = make_unique<Scope>(this, nullptr);
-    rootScope->Parse(parser);
-}
-
-CallingConvention Function::getCallingConvention(const std::wstring &convention) {
-    if (convention == L"cdecl") {
-        return CallingConvention::cdecl;
-    } else if (convention == L"stdcall") {
-        return CallingConvention::stdcall;
-    } else {
-        return CallingConvention::unknown;
-    }
-}
-
-const wstring &Function::getFunctionName() const {
-    return functionName;
-}
-
-CallingConvention Function::getCallingConvention() const {
-    return callingConvention;
-}
-
-const vector<unique_ptr<Variable>> &Function::getParameters() const {
-    return parameters;
-}
-
-const unique_ptr<Variable> &Function::getReturnVariable() const {
-    return returnVariable;
-}
-
-const unique_ptr<Scope> &Function::getRootScope() const {
-    return rootScope;
-}
-
-const Module *Function::getParent() const {
-    return parent;
 }

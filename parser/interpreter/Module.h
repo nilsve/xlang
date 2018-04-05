@@ -6,26 +6,34 @@
 #define XLANG_MODULE_H
 
 #include <string>
-#include "../TokenParser.h"
+#include "TokenParser.h"
 #include "Function.h"
 #include "Variable.h"
 #include <vector>
 
-class Module : public non_copyable  {
-private:
-    std::wstring moduleName;
-    std::vector<std::unique_ptr<Function>> functions;
-    std::vector<std::unique_ptr<Variable>> variables;
+namespace xlang {
+    namespace interpreter {
 
-    void parseFunction(TokenParser &parser);
-    void parseVariable(TokenParser &parser);
-public:
-    void Parse(TokenParser& parser);
+        class Module : public utils::non_copyable {
+        private:
+            std::wstring moduleName;
+            std::vector<std::unique_ptr<Function>> functions;
+            std::vector<std::unique_ptr<Variable>> variables;
 
-    std::wstring getModuleName() const;
-    const std::vector<std::unique_ptr<Function>>& getFunctions() const;
-    const std::vector<std::unique_ptr<Variable>>& getVariables() const;
-};
+            void parseFunction(TokenParser &parser);
 
+            void parseVariable(TokenParser &parser);
+
+        public:
+            void Parse(TokenParser &parser);
+
+            std::wstring getModuleName() const;
+
+            const std::vector<std::unique_ptr<Function>> &getFunctions() const;
+
+            const std::vector<std::unique_ptr<Variable>> &getVariables() const;
+        };
+    }
+}
 
 #endif //XLANG_MODULE_H

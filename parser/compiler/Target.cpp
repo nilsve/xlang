@@ -5,10 +5,17 @@
 #include "../interpreter/Function.h"
 #include "Target.h"
 
-CallingConvention Target::getCallingConvention() const {
-    return callingConvention;
-}
+namespace xlang {
+    namespace compiler {
 
-void Target::setCallingConvention(CallingConvention callingConvention) {
-    Target::callingConvention = callingConvention;
+        using namespace interpreter;
+
+        CallingConvention Target::getCallingConvention() const {
+            return callingConvention;
+        }
+
+        void Target::setCallingConvention(CallingConvention callingConvention) {
+            Target::callingConvention = callingConvention;
+        }
+    }
 }

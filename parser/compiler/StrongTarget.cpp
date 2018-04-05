@@ -8,63 +8,69 @@
 #include "../interpreter/Function.h"
 #include "../interpreter/Scope.h"
 
-std::wstring StrongTarget::getModuleName() const {
-    return getFunction().getParent()->getModuleName();
-}
+namespace xlang {
+    namespace compiler {
 
-std::wstring StrongTarget::getFunctionName() const {
-    return getFunction().getFunctionName();
-}
+        using namespace interpreter;
 
-std::wstring StrongTarget::getScopeId() const {
-    if (type == StrongTargetType::scope) {
-        return target.scope->getScopeId();
-    }
-    return L"";
-}
+        std::wstring StrongTarget::getModuleName() const {
+            return getFunction().getParent()->getModuleName();
+        }
 
-const Function &StrongTarget::getFunction() const {
-    const Function* function = nullptr;
-    if (type == StrongTargetType::scope) {
-        function = target.scope->getParentFunction();
-    } else {
-        function = target.function;
-    }
+        std::wstring StrongTarget::getFunctionName() const {
+            return getFunction().getFunctionName();
+        }
 
-    assert(function);
-    return *function;
-}
+        std::wstring StrongTarget::getScopeId() const {
+            if (type == StrongTargetType::scope) {
+                return target.scope->getScopeId();
+            }
+            return L"";
+        }
+
+        const Function &StrongTarget::getFunction() const {
+            const Function *function = nullptr;
+            if (type == StrongTargetType::scope) {
+                function = target.scope->getParentFunction();
+            } else {
+                function = target.function;
+            }
+
+            assert(function);
+            return *function;
+        }
 
 
-std::wstring StrongTarget::getFullPath() const {
+        std::wstring StrongTarget::getFullPath() const {
 
-    switch (type) {
-        case StrongTargetType::scope:
-            assert(target.scope);
-            return getPath(target.scope);
-        case StrongTargetType::function:
-            assert(target.function);
-            return getPath(target.function);
-        default:
+            switch (type) {
+                case StrongTargetType::scope:
+                    assert(target.scope);
+                    return getPath(target.scope);
+                case StrongTargetType::function:
+                    assert(target.function);
+                    return getPath(target.function);
+            }
+
             assert(false);
-            break;
+        }
+
+        std::wstring StrongTarget::getPath(const Scope *scope) const {
+            std::wstring result = scope->getScopeId();
+            if (auto function = scope->getParentFunction()) {
+                result = getPath(scope->getParentFunction()) + L"_" + result;
+            }
+
+            return result;
+        }
+
+        std::wstring StrongTarget::getPath(const Function *function) const {
+            std::wstring result = function->getFunctionName();
+            if (auto module = function->getParent()) {
+                result = module->getModuleName() + L"_" + result;
+            }
+
+            return result;
+        }
     }
-}
-
-std::wstring StrongTarget::getPath(const Scope* scope) const {
-    std::wstring result = scope->getScopeId();
-    if (auto function = scope->getParentFunction()) {
-        result = getPath(scope->getParentFunction()) + L"_" + result;
-    }
-
-    return result;
-}
-
-std::wstring StrongTarget::getPath(const Function* function) const {
-    std::wstring result = function->getFunctionName();
-    if (auto module = function->getParent()) {
-        result = module->getModuleName() + L"_" + result;
-    }
-
-    return result;
 }

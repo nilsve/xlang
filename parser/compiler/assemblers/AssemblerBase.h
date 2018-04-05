@@ -10,21 +10,31 @@
 #include "../../interpreter/Function.h"
 #include "../../interpreter/Module.h"
 
-class AssemblerBase {
-public:
-    virtual std::wstring assembleInstruction(const Instruction& instruction) const = 0;
-    virtual std::wstring assembleFunctionEnd(const Function& function) const = 0;
-    virtual std::wstring assembleScopeEnd(const Scope& scope) const = 0;
-    virtual std::wstring assembleData(const Data& data) const = 0;
+namespace xlang {
+    namespace compiler {
+        namespace assemblers {
 
-    virtual std::wstring assembleFunctionStart(const Function & function) const {
-        return function.getParent()->getModuleName() + L"_" + function.getFunctionName() + L":";
-    };
+            class AssemblerBase {
+            public:
+                virtual std::wstring assembleInstruction(const compiler::instructions::Instruction &instruction) const = 0;
 
-    virtual std::wstring assembleScopeStart(const Scope& scope) const {
-        return scope.getParentFunction()->getParent()->getModuleName() + L"_" + scope.getParentFunction()->getFunctionName() + L"_" + scope.getScopeId();
-    };
-};
+                virtual std::wstring assembleFunctionEnd(const interpreter::Function &function) const = 0;
 
+                virtual std::wstring assembleScopeEnd(const interpreter::Scope &scope) const = 0;
+
+                virtual std::wstring assembleData(const interpreter::Data &data) const = 0;
+
+                virtual std::wstring assembleFunctionStart(const interpreter::Function &function) const {
+                    return function.getParent()->getModuleName() + L"_" + function.getFunctionName() + L":";
+                };
+
+                virtual std::wstring assembleScopeStart(const interpreter::Scope &scope) const {
+                    return scope.getParentFunction()->getParent()->getModuleName() + L"_" +
+                           scope.getParentFunction()->getFunctionName() + L"_" + scope.getScopeId();
+                };
+            };
+        }
+    }
+}
 
 #endif //XLANG_ASSEMBLERBASE_H

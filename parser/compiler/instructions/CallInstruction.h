@@ -13,21 +13,30 @@
 #include <memory>
 #include <vector>
 
-class CallInstruction : public Instruction {
-private:
-    const std::unique_ptr<Target> target;
-    const std::vector<const Variable*> parameters;
-public:
-    CallInstruction(std::unique_ptr<Target> _target, std::vector<const Variable*> _parameters) : target(std::move(_target)), parameters(std::move(_parameters)) {}
-    CallInstruction(std::unique_ptr<Target> _target) : target(std::move(_target)) {}
+namespace xlang {
+    namespace compiler {
+        namespace instructions {
 
-    Target* getTarget() const {
-        return target.get();
-    }
+            class CallInstruction : public Instruction {
+            private:
+                const std::unique_ptr<Target> target;
+                const std::vector<const interpreter::Variable *> parameters;
+            public:
+                CallInstruction(std::unique_ptr<Target> _target, std::vector<const interpreter::Variable *> _parameters) : target(
+                        std::move(_target)), parameters(std::move(_parameters)) {}
 
-    const std::vector<const Variable *> &getParameters() const {
-        return parameters;
+                explicit CallInstruction(std::unique_ptr<Target> _target) : target(std::move(_target)) {}
+
+                Target *getTarget() const {
+                    return target.get();
+                }
+
+                const std::vector<const interpreter::Variable *> &getParameters() const {
+                    return parameters;
+                }
+            };
+        }
     }
-};
+}
 
 #endif //XLANG_CALLNSTRUCTION_H

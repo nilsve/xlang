@@ -7,24 +7,29 @@
 
 #include "instructions/Instruction.h"
 #include "instructions/CallInstruction.h"
-#include "../Parser.h"
+#include "../interpreter/Parser.h"
 
 #include <iostream>
 
-class Target;
+namespace xlang {
+    namespace compiler {
 
-class InstructionValidator {
-    private:
-        const Parser& parser;
+        class Target;
 
-        bool findScopeId(const Scope& rootScope, std::wstring scopeId) const;
+        class InstructionValidator {
+        private:
+            const interpreter::Parser &parser;
 
-        void handleTarget(const Instruction &instruction, Target& target) const;
+            bool findScopeId(const interpreter::Scope &rootScope, std::wstring scopeId) const;
 
-    public:
-        explicit InstructionValidator(const Parser& _parser) : parser(_parser) {}
+            void handleTarget(const compiler::instructions::Instruction &instruction, compiler::Target &target) const;
 
-        void validateAndPatchInstruction(Instruction& instruction) const;
-};
+        public:
+            explicit InstructionValidator(const interpreter::Parser &_parser) : parser(_parser) {}
+
+            void validateAndPatchInstruction(compiler::instructions::Instruction &instruction) const;
+        };
+    }
+}
 
 #endif //XLANG_INSTRUCTIONVALIDATOR_H

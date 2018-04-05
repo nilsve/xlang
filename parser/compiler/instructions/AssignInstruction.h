@@ -9,29 +9,36 @@
 #include "../../interpreter/Variable.h"
 #include "../../interpreter/Data.h"
 
-class AssignInstruction : public Instruction {
-private:
-    const Variable* target;
-    const Data* data;
+namespace xlang {
+    namespace compiler {
+        namespace instructions {
 
-public:
-    AssignInstruction(const Variable& _target, const Data& _data) : target(&_target), data(&_data) {}
+            class AssignInstruction : public Instruction {
+            private:
+                const interpreter::Variable *target;
+                const interpreter::Data *data;
 
-    const Variable *getTarget() const {
-        return target;
+            public:
+                AssignInstruction(const interpreter::Variable &_target, const interpreter::Data &_data) : target(&_target), data(&_data) {}
+
+                const interpreter::Variable *getTarget() const {
+                    return target;
+                }
+
+                void setTarget(const interpreter::Variable *target) {
+                    AssignInstruction::target = target;
+                }
+
+                const interpreter::Data *getData() const {
+                    return data;
+                }
+
+                void setData(const interpreter::Data *data) {
+                    AssignInstruction::data = data;
+                }
+            };
+        }
     }
-
-    void setTarget(const Variable *target) {
-        AssignInstruction::target = target;
-    }
-
-    const Data *getData() const {
-        return data;
-    }
-
-    void setData(const Data *data) {
-        AssignInstruction::data = data;
-    }
-};
+}
 
 #endif //XLANG_ASSIGNINSTRUCTION_H

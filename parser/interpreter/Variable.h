@@ -7,40 +7,46 @@
 
 
 #include "../../utils/non_copyable.h"
-#include "../TokenParser.h"
+#include "TokenParser.h"
 #include <string>
 
-class Scope;
+namespace xlang {
+    namespace interpreter {
 
-class Variable : public non_copyable {
-private:
-    std::wstring dataType;
-    const bool isFunctionArgument;
-    std::wstring variableName;
+        class Scope;
 
-    int variableIndex = -1; // Variable index (offset) on scope / module
+        class Variable : public utils::non_copyable {
+        private:
+            std::wstring dataType;
+            const bool isFunctionArgument;
+            std::wstring variableName;
 
-    bool isPointer = false;
-    bool isArray = false;
-    size_t arrayLength = 0;
+            int variableIndex = -1; // Variable index (offset) on scope / module
 
-    bool validateVariable(std::string& result);
-public:
-    explicit Variable(bool isFunctionArgument = false) : isFunctionArgument(isFunctionArgument) {}
+            bool isPointer = false;
+            bool isArray = false;
+            size_t arrayLength = 0;
 
-    void Parse(TokenParser& parser);
+            bool validateVariable(std::string &result);
 
-    static bool isVariableType(const Token& token);
+        public:
+            explicit Variable(bool isFunctionArgument = false) : isFunctionArgument(isFunctionArgument) {}
 
-    static std::unique_ptr<Variable> parseFunctionArg(TokenParser &parser);
+            void Parse(TokenParser &parser);
 
-    const std::wstring &getVariableName() const;
+            static bool isVariableType(const Token &token);
 
-    void setVariableIndex(int variableIndex);
-    int getVariableIndex() const;
+            static std::unique_ptr<Variable> parseFunctionArg(TokenParser &parser);
 
-    const std::wstring &getDataType() const;
-};
+            const std::wstring &getVariableName() const;
 
+            void setVariableIndex(int variableIndex);
+
+            int getVariableIndex() const;
+
+            const std::wstring &getDataType() const;
+        };
+    }
+}
 
 #endif //XLANG_VARIABLE_H

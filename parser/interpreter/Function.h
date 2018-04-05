@@ -6,50 +6,60 @@
 #define XLANG_FUNCTION_H
 
 
-#include "../TokenParser.h"
+#include "TokenParser.h"
 #include "Variable.h"
 #include "Scope.h"
 
 #include <memory>
 #include <vector>
 
-enum class CallingConvention {
-    cdecl,
-    stdcall,
-    unknown,
-};
+namespace xlang {
+    namespace interpreter {
 
-class Module;
+        enum class CallingConvention {
+            cdecl,
+            stdcall,
+            unknown,
+        };
 
-class Function : public non_copyable  {
-private:
-    const Module* parent = nullptr;
+        class Module;
 
-    std::wstring functionName;
-    CallingConvention callingConvention;
+        class Function : public utils::non_copyable {
+        private:
+            const Module *parent = nullptr;
 
-    std::vector<std::unique_ptr<Variable>> parameters;
-    std::unique_ptr<Variable> returnVariable;
+            std::wstring functionName;
+            CallingConvention callingConvention;
 
-    std::unique_ptr<Scope> rootScope;
+            std::vector<std::unique_ptr<Variable>> parameters;
+            std::unique_ptr<Variable> returnVariable;
 
-    void parseHeader(TokenParser& parser);
-    void parseBody(TokenParser& parser);
+            std::unique_ptr<Scope> rootScope;
 
-    static CallingConvention getCallingConvention(const std::wstring& convention);
-public:
-    explicit Function(const Module* _parent) : parent(_parent) {}
-    void Parse(TokenParser& parser);
+            void parseHeader(TokenParser &parser);
 
-    const std::wstring &getFunctionName() const;
+            void parseBody(TokenParser &parser);
 
-    const Module *getParent() const;
+            static CallingConvention getCallingConvention(const std::wstring &convention);
 
-    CallingConvention getCallingConvention() const;
-    const std::vector<std::unique_ptr<Variable>> &getParameters() const;
-    const std::unique_ptr<Variable> &getReturnVariable() const;
-    const std::unique_ptr<Scope> &getRootScope() const;
-};
+        public:
+            explicit Function(const Module *_parent) : parent(_parent) {}
 
+            void Parse(TokenParser &parser);
+
+            const std::wstring &getFunctionName() const;
+
+            const Module *getParent() const;
+
+            CallingConvention getCallingConvention() const;
+
+            const std::vector<std::unique_ptr<Variable>> &getParameters() const;
+
+            const std::unique_ptr<Variable> &getReturnVariable() const;
+
+            const std::unique_ptr<Scope> &getRootScope() const;
+        };
+    }
+}
 
 #endif //XLANG_FUNCTION_H

@@ -9,19 +9,27 @@
 #include "../../interpreter/Function.h"
 #include "../../interpreter/Module.h"
 
-class NasmX86Assembler : public AssemblerBase {
-public:
-    std::wstring assembleInstruction(const Instruction &instruction) const override;
+namespace xlang {
+    namespace compiler {
+        namespace assemblers {
 
-    std::wstring assembleFunctionStart(const Function &function) const override;
-    std::wstring assembleFunctionEnd(const Function& function) const override;
+            class NasmX86Assembler : public AssemblerBase {
+            public:
+                std::wstring assembleInstruction(const compiler::instructions::Instruction &instruction) const override;
 
-    std::wstring assembleData(const Data &data) const override;
+                std::wstring assembleFunctionStart(const interpreter::Function &function) const override;
 
-    std::wstring assembleScopeStart(const Scope &scope) const override;
-    std::wstring assembleScopeEnd(const Scope& scope) const override;
+                std::wstring assembleFunctionEnd(const interpreter:: Function &function) const override;
 
-};
+                std::wstring assembleData(const interpreter::Data &data) const override;
 
+                std::wstring assembleScopeStart(const interpreter::Scope &scope) const override;
+
+                std::wstring assembleScopeEnd(const interpreter::Scope &scope) const override;
+
+            };
+        }
+    }
+}
 
 #endif //XLANG_NasmX86Assembler_H

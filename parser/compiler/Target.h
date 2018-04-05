@@ -8,20 +8,26 @@
 #include <string>
 #include "../interpreter/Function.h"
 
-class Target : public non_copyable {
-private:
-    CallingConvention callingConvention;
-public:
-    virtual std::wstring getModuleName() const = 0;
+namespace xlang {
+    namespace compiler {
 
-    CallingConvention getCallingConvention() const;
+        class Target : public utils::non_copyable {
+        private:
+            interpreter::CallingConvention callingConvention;
+        public:
+            virtual std::wstring getModuleName() const = 0;
 
-    void setCallingConvention(CallingConvention callingConvention);
+            interpreter::CallingConvention getCallingConvention() const;
 
-    virtual std::wstring getFunctionName() const = 0;
-    virtual std::wstring getScopeId() const = 0;
+            void setCallingConvention(interpreter::CallingConvention callingConvention);
 
-    virtual std::wstring getFullPath() const = 0;
-};
+            virtual std::wstring getFunctionName() const = 0;
+
+            virtual std::wstring getScopeId() const = 0;
+
+            virtual std::wstring getFullPath() const = 0;
+        };
+    }
+}
 
 #endif //XLANG_TARGET_H
