@@ -58,7 +58,7 @@ namespace xlang {
         std::wstring StrongTarget::getPath(const Scope *scope) const {
             std::wstring result = scope->getScopeId();
             if (auto function = scope->getParentFunction()) {
-                result = getPath(scope->getParentFunction()) + L"_" + result;
+                result = getPath(function) + L"_" + result;
             }
 
             return result;

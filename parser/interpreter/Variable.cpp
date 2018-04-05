@@ -71,21 +71,6 @@ namespace xlang {
 
             variableName = token.token;
 
-            /*if (!isFunctionArgument) {
-                // Function arguments can't have default values TODO
-
-                token = parser.peekToken(false);
-
-                if (token == L"=") {
-                    parser.eatToken(); // Remove previously peeked token
-
-                    // Directly initialize
-                    token = parser.getToken();
-
-                    //FIXME
-                }
-            }*/
-
             string errorMessage;
             if (validateVariable(errorMessage)) {
                 parser.throwError(errorMessage);

@@ -41,7 +41,6 @@ namespace xlang {
             parsed = true;
         }
 
-
         void Parser::parseModule(TokenParser &parser) {
             auto module = make_unique<Module>();
             module->Parse(parser);

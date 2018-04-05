@@ -59,9 +59,8 @@ namespace xlang {
                 for (auto &module : modules) {
                     for (auto &function : module->getFunctions()) {
 
-                        StrongTarget target(*function->getRootScope());
-                        instructions::JmpInstruction jmp(
-                                std::unique_ptr<Target>((Target *) (new StrongTarget(*function->getRootScope()))));
+                        auto target = std::unique_ptr<Target>((Target *) (new StrongTarget(*function->getRootScope())));
+                        instructions::JmpInstruction jmp(std::move(target));
                         appendCodeBlock(
                                 assembler.assembleFunctionStart(*function) + L"\n" +
                                 assembler.assembleInstruction(jmp));
@@ -132,13 +131,20 @@ namespace xlang {
 
                 compileModules(modules);
 
+                std::wstring result;
+
                 if (auto mainModule = findModule(modules, L"main")) {
                     if (auto mainFunction = findFunction(*mainModule, L"main")) {
-
+                        auto target = std::unique_ptr<Target>((Target*)new StrongTarget(*mainFunction));
+                        instructions::JmpInstruction jmp(std::move(target));
+                        result += assembler.assembleInstruction(jmp) + L"\n";
+                    } else {
+                        utils::Utils::throwError("Function `main` in module `main` not found!");
                     }
+                } else {
+                    utils::Utils::throwError("Module `main` not found!");
                 }
 
-                std::wstring result;
                 unsigned long size = 0;
                 for (std::wstring &block : code) {
                     size += block.size();
