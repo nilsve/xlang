@@ -159,9 +159,17 @@ namespace xlang {
         }
 
         void Scope::updateVariable(TokenParser &parser, const Variable &variable) {
-            assert(parser.getToken() == L"=");
 
-            auto token = parser.getToken(true);
+            auto token = parser.getToken();
+
+            if (token == L".") {
+                // Possibly accidentally declared variable with same name as module name
+                parser.throwError("Trying to access functions on variable!");
+            }
+
+            assert(token == L"=");
+
+            token = parser.getToken(true);
 
             const Data *_data = nullptr;
 

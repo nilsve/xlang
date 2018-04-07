@@ -8,6 +8,9 @@
 #include "../instructions/JmpInstruction.h"
 
 #include <iostream>
+#include <cassert>
+#include <sstream>
+#include <iomanip>
 
 namespace xlang {
     namespace compiler {
@@ -18,14 +21,13 @@ namespace xlang {
             std::wstring NasmX86Assembler::assembleInstruction(const compiler::instructions::Instruction &instruction) const {
                 if (auto callInstruction = dynamic_cast<const compiler::instructions::CallInstruction *>(&instruction)) {
 
-                    auto target = callInstruction->getTarget();
                     std::wstring result;
 
                     for (auto &parameter : callInstruction->getParameters()) {
                         result += L"push DWORD [ebp + " + std::to_wstring(parameter->getVariableIndex()) + L"]\n";
                     }
 
-                    return result + L"call " + target->getFullPath();
+                    return result + L"call " + callInstruction->getTarget()->getFullPath();
                 } else if (auto assignInstruction = dynamic_cast<const compiler::instructions::AssignInstruction *>(&instruction)) {
 
                     if (auto target = assignInstruction->getTarget()) {
@@ -33,6 +35,8 @@ namespace xlang {
                             return L"mov DWORD eax, " + data->getDataId() + L"\n"
                                                                             L"mov DWORD [ebp + " +
                                    std::to_wstring(target->getVariableIndex() * REGISTER_SIZE) + L"], eax";
+                        } else {
+                            assert(false);
                         }
                     } else {
                         utils::Utils::throwError("Target empty for assignment instruction!");
@@ -83,16 +87,25 @@ namespace xlang {
             }
 
             std::wstring NasmX86Assembler::assembleData(const interpreter::Data &data) const {
-                auto result = data.getDataId() + L":\n";
+                std::wstringstream stream;
+                stream << data.getDataId() << L": ";
 
                 auto &bytes = data.getData();
 
-                result.reserve(bytes.size() + result.size());
+//                bool first = true;
                 for (auto chr : data.getData()) {
-                    result += chr;
+
+//                    if (!first) {
+//                        stream << L",";
+//                    } else {
+//                        first = false;
+//                    }
+
+                    stream << L"0x" << std::hex << std::setw(2) << std::setfill(L'0') << int(chr) << L",";
                 }
 
-                return result;
+                stream << L"0x0";
+                return stream.str();
             }
         }
     }

@@ -8,6 +8,8 @@
 #include "../interpreter/Function.h"
 #include "../interpreter/Scope.h"
 
+#include <cassert>
+
 namespace xlang {
     namespace compiler {
 

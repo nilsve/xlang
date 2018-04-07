@@ -14,6 +14,7 @@
 #include "StrongTarget.h"
 
 #include <vector>
+#include <cassert>
 #include <type_traits>
 #include <map>
 #include <iostream>
