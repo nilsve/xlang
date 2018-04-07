@@ -30,7 +30,7 @@ namespace xlang {
                 if (token == L"}") {
                     parser.eatToken();
                     break;
-                } else if (token == L"function") {
+                } else if (token == L"FUNCTION") {
                     parseFunction(parser);
                 } else if (Variable::isVariableType(token)) {
                     parseVariable(parser);

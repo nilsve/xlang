@@ -8,6 +8,7 @@
 
 #include <string>
 #include "../../utils/non_copyable.h"
+#include "TokenParser.h"
 
 namespace xlang {
     namespace interpreter {
@@ -20,9 +21,10 @@ namespace xlang {
             const std::wstring relativePath;
             std::wstring code;
 
-            void resolveImports();
+            void Preprocess();
 
-            std::wstring resolvePath(std::wstring relativePath);
+            std::wstring resolvePath(std::wstring relativePath) const;
+            void handlePreProcessor(TokenParser& parser);
 
         public:
             CodeFile(std::wstring relativePath, Parser &parser);

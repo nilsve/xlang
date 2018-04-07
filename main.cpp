@@ -14,7 +14,7 @@ int main() {
     parser.Parse();
 
     Compiler<NasmX86Assembler> compiler(parser);
-    compiler.setDataStorageMode(DataStorageMode::scope);
+    compiler.setDataStorageMode(DataStorageMode::SCOPE);
     std::wcout << compiler.Compile();
 
     return 0;

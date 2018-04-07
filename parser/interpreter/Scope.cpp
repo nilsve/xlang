@@ -63,7 +63,7 @@ namespace xlang {
             token = parser.getToken();
 
             if (token == L".") {
-                // Function name isn't function name but module name
+                // Function name isn't FUNCTION name but module name
                 moduleName = std::move(functionName);
                 token = parser.getToken();
                 functionName = token.token;
@@ -99,7 +99,7 @@ namespace xlang {
 
             }
             if (parser.getToken() != L";") {
-                parser.throwError("Expected ; after function call!");
+                parser.throwError("Expected ; after FUNCTION call!");
             }
 
             auto call = unique_ptr<Instruction>((Instruction * )(new CallInstruction(
@@ -114,7 +114,7 @@ namespace xlang {
 
         const Variable *Scope::getVariable(const Token &token) const {
 
-            // FIXME: Deze call is recursief. De arguments worden dus voor iedere geneste scope nog een keer uitgelezen
+            // FIXME: Deze call is recursief. De arguments worden dus voor iedere geneste SCOPE nog een keer uitgelezen
             if (auto parentFunction = getParentFunction()) {
                 for (auto &argument : parentFunction->getParameters()) {
                     if (token == argument->getVariableName()) {

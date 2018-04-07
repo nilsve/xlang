@@ -29,7 +29,7 @@ namespace xlang {
             const interpreter::Parser &parser;
             const std::unique_ptr<InstructionValidator> validator;
             Assembler assembler;
-            interpreter::DataStorageMode dataStorageMode = interpreter::DataStorageMode::section;
+            interpreter::DataStorageMode dataStorageMode = interpreter::DataStorageMode::SECTION;
 
             std::vector<std::wstring> code;
             std::vector<std::wstring> data;
@@ -101,10 +101,10 @@ namespace xlang {
                 auto result = assembler.assembleData(data);
 
                 switch (dataStorageMode) {
-                    case interpreter::DataStorageMode::section:
+                    case interpreter::DataStorageMode::SECTION:
                         appendDataBlock(std::move(result));
                         break;
-                    case interpreter::DataStorageMode::scope:
+                    case interpreter::DataStorageMode::SCOPE:
                         appendCodeBlock(std::move(result));
                         break;
                     default:

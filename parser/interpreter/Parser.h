@@ -20,6 +20,8 @@ namespace xlang {
         private:
             bool parsed = false;
 
+            const std::wstring workspace;
+
             std::vector<std::unique_ptr<CodeFile>> codeFiles;
             std::vector<std::unique_ptr<Module>> modules;
 
@@ -28,15 +30,13 @@ namespace xlang {
             void parseModule(TokenParser &parser);
 
         public:
-            const std::wstring workspace;
-
             Parser(const std::wstring &workspace, const std::wstring &mainFilePath);
-
             void Parse();
-
             CodeFile &loadFile(const std::wstring &filePath);
 
             const std::vector<std::unique_ptr<Module>> &getModules() const;
+
+            const std::wstring &getWorkspace() const;
         };
     }
 }

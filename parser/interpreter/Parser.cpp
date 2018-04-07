@@ -16,10 +16,14 @@ using namespace std;
 namespace xlang {
     namespace interpreter {
 
-        Parser::Parser(const std::wstring &workspace, const std::wstring &mainFilePath) : workspace(workspace) {
+        Parser::Parser(const std::wstring &_workspace, const std::wstring &mainFilePath) : workspace(_workspace) {
             auto &codeFile = loadFile(mainFilePath);
             mainFile = &codeFile;
             mainFile->Load();
+        }
+
+        const wstring &Parser::getWorkspace() const {
+            return workspace;
         }
 
         void Parser::Parse() {

@@ -20,8 +20,8 @@ namespace xlang {
     namespace compiler {
 
         enum class StrongTargetType {
-            scope,
-            function,
+            SCOPE,
+            FUNCTION,
         };
 
 
@@ -42,12 +42,12 @@ namespace xlang {
 
         public:
             explicit StrongTarget(const interpreter::Scope &scope) {
-                type = StrongTargetType::scope;
+                type = StrongTargetType::SCOPE;
                 target.scope = &scope;
             }
 
             explicit StrongTarget(const interpreter::Function &function) {
-                type = StrongTargetType::function;
+                type = StrongTargetType::FUNCTION;
                 target.function = &function;
             }
 

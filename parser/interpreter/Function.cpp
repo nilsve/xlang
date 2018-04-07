@@ -17,7 +17,7 @@ namespace xlang {
         }
 
         void Function::parseHeader(TokenParser &parser) {
-            assert(parser.getToken() == L"function");
+            assert(parser.getToken() == L"FUNCTION");
 
             auto functionName = parser.getToken();
             this->functionName = functionName.token;
@@ -26,10 +26,10 @@ namespace xlang {
 
             if (token != L"(") {
                 CallingConvention convention = getCallingConvention(token.token);
-                if (convention != CallingConvention::unknown) {
+                if (convention != CallingConvention::UNKNOWN) {
                     callingConvention = convention;
                 } else {
-                    parser.throwError("Unexpected token after function name!");
+                    parser.throwError("Unexpected token after FUNCTION name!");
                 }
 
                 token = parser.getToken();
@@ -74,12 +74,12 @@ namespace xlang {
         }
 
         CallingConvention Function::getCallingConvention(const std::wstring &convention) {
-            if (convention == L"cdecl") {
-                return CallingConvention::cdecl;
-            } else if (convention == L"stdcall") {
-                return CallingConvention::stdcall;
+            if (convention == L"CDECL") {
+                return CallingConvention::CDECL;
+            } else if (convention == L"STDCALL") {
+                return CallingConvention::STDCALL;
             } else {
-                return CallingConvention::unknown;
+                return CallingConvention::UNKNOWN;
             }
         }
 

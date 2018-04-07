@@ -47,7 +47,7 @@ namespace xlang {
             std::wstring NasmX86Assembler::assembleFunctionEnd(const interpreter::Function &function) const {
                 return L"mov esp, ebp\n"
                        L"pop ebp\n"
-                       L"ret " + (function.getCallingConvention() == interpreter::CallingConvention::cdecl ? std::to_wstring(
+                       L"ret " + (function.getCallingConvention() == interpreter::CallingConvention::CDECL ? std::to_wstring(
                         function.getParameters().size() * REGISTER_SIZE) : L"");
             }
 
