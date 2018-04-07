@@ -26,13 +26,15 @@ namespace xlang {
             const std::wstring scopeId;
             const Function *parentFunction = nullptr;
             const Scope *parentScope = nullptr;
+            const bool isRawBlock = false;
+            std::wstring rawCode;
 
             std::vector<std::unique_ptr<Scope>> scopes;
             std::vector<std::unique_ptr<Variable>> variables;
             std::vector<std::unique_ptr<compiler::instructions::Instruction>> instructions;
             std::vector<std::unique_ptr<Data>> data;
 
-            std::unique_ptr<Scope> parseNestedScope(TokenParser &parser);
+            void parseNestedScope(TokenParser &parser, bool isRawBlock = false);
 
             void parseFunctionCall(TokenParser &parser);
 
@@ -45,9 +47,10 @@ namespace xlang {
             unsigned int calculateVariableIndex() const;
 
         public:
-            Scope(const Function *_parentFunction, const Scope *_parentScope) : scopeId(utils::Utils::generateUuid()),
+            Scope(const Function *_parentFunction, const Scope *_parentScope, bool _isAsmBlock = false) : scopeId(utils::Utils::generateUuid()),
                                                                                 parentFunction(_parentFunction),
-                                                                                parentScope(_parentScope) {}
+                                                                                parentScope(_parentScope),
+                                                                                isRawBlock(_isAsmBlock) {}
 
             void Parse(TokenParser &parser);
 
@@ -67,6 +70,10 @@ namespace xlang {
 
             template<typename T>
             const Data &upsertData(T search);
+
+            bool getIsRawBlock() const;
+
+            const std::wstring &getRawCode() const;
         };
     }
 }

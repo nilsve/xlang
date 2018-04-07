@@ -102,6 +102,18 @@ namespace xlang {
             }
         }
 
+        std::wstring TokenParser::readUntill(wchar_t character) {
+            auto startPos = position;
+            for (; position < code.length(); position++) {
+                char chr = code[position];
+                if (chr == character) {
+                    return code.substr(startPos, position - startPos);
+                }
+            }
+
+            throwError(std::wstring(L"End character ") + character + std::wstring(L"not found!"));
+        }
+
         bool Token::operator==(const std::wstring &other) const {
             return this->token == other;
         }

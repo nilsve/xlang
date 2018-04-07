@@ -82,9 +82,13 @@ namespace xlang {
                 std::wstring scopeCode;
                 scopeCode += assembler.assembleScopeStart(scope) + L"\n";
 
-                for (auto &instruction : scope.getInstructions()) {
-                    validator->validateAndPatchInstruction(*instruction);
-                    scopeCode += assembler.assembleInstruction(*instruction) + L"\n";
+                if (scope.getIsRawBlock()) {
+                    scopeCode += scope.getRawCode();
+                } else {
+                    for (auto &instruction : scope.getInstructions()) {
+                        validator->validateAndPatchInstruction(*instruction);
+                        scopeCode += assembler.assembleInstruction(*instruction) + L"\n";
+                    }
                 }
 
                 scopeCode += assembler.assembleScopeEnd(scope);

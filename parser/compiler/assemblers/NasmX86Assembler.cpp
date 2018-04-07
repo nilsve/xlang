@@ -16,7 +16,15 @@ namespace xlang {
     namespace compiler {
         namespace assemblers {
 
-            const unsigned long REGISTER_SIZE = 4;
+            const long REGISTER_SIZE = 4;
+
+            int getVariableIndex(int variableIndex) {
+                if (variableIndex >= 0) {
+                    return variableIndex;
+                } else {
+                    return variableIndex - 1;
+                }
+            }
 
             std::wstring NasmX86Assembler::assembleInstruction(const compiler::instructions::Instruction &instruction) const {
                 if (auto callInstruction = dynamic_cast<const compiler::instructions::CallInstruction *>(&instruction)) {
@@ -34,7 +42,7 @@ namespace xlang {
                         if (auto data = assignInstruction->getData()) {
                             return L"mov DWORD eax, " + data->getDataId() + L"\n"
                                                                             L"mov DWORD [ebp + " +
-                                   std::to_wstring(target->getVariableIndex() * REGISTER_SIZE) + L"], eax";
+                                   std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
                         } else {
                             assert(false);
                         }
@@ -88,7 +96,7 @@ namespace xlang {
 
             std::wstring NasmX86Assembler::assembleData(const interpreter::Data &data) const {
                 std::wstringstream stream;
-                stream << data.getDataId() << L": ";
+                stream << data.getDataId() << L": db ";
 
                 auto &bytes = data.getData();
 

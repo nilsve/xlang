@@ -41,8 +41,8 @@ namespace xlang {
             explicit TokenParser(const std::wstring &code) : code(code) {}
 
             const Token getToken(bool allowStringLiteral = false);
-
             const Token peekToken(bool allowStringLiteral = false);
+            std::wstring readUntill(wchar_t character);
 
             template<typename T>
             void throwError(T message) const {

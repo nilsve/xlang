@@ -11,7 +11,12 @@ using namespace xlang::interpreter;
 using namespace xlang::compiler;
 using namespace xlang::compiler::assemblers;
 
+using namespace std;
+
 int main() {
+
+    srand(0); // Predictable scope names etc
+
     Parser parser(L"/Users/nilsvaneijk/Desktop/test/", L"main.x");
     parser.Parse();
 
@@ -19,9 +24,10 @@ int main() {
     compiler.setDataStorageMode(DataStorageMode::SCOPE);
     
     auto translated = compiler.Compile();
-    std::wcout << translated;
+    wcout << translated;
 
-    std::wofstream out("/Users/nilsvaneijk/Desktop/test/output.asm");
+    wofstream out("/Users/nilsvaneijk/Desktop/test/output.asm");
+    out << L"section .text" << endl << L"global start" << endl << L"start:" << endl << endl;
     out.write(translated.c_str(), translated.size());
     out.close();
 

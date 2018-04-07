@@ -25,20 +25,22 @@ namespace xlang {
         void Scope::Parse(TokenParser &parser) {
             assert(parser.getToken() == L"{");
 
+            if (getIsRawBlock()) {
+                // Read untill } character
+                rawCode = parser.readUntill(L'}');
+            }
+
             while (true) {
                 auto token = parser.peekToken();
 
                 if (token == L"{") {
-                    auto scope = parseNestedScope(parser);
-
-                    auto call = unique_ptr<Instruction>(
-                            (Instruction * )(new CallInstruction(unique_ptr<Target>(new StrongTarget(*scope)))));
-                    instructions.emplace_back(std::move(call));
-
-                    scopes.push_back(std::move(scope));
+                    parseNestedScope(parser);
                 } else if (token == L"}") {
                     parser.eatToken();
                     break;
+                } else if (token == L"__raw") {
+                    parser.eatToken();
+                    parseNestedScope(parser, true);
                 } else if (Variable::isVariableType(token)) {
                     declareVariable(parser);
                 } else if (auto variable = getVariable(token)) {
@@ -51,6 +53,10 @@ namespace xlang {
             }
 
             // TODO: Return?
+        }
+
+        bool Scope::getIsRawBlock() const {
+            return isRawBlock;
         }
 
         void Scope::parseFunctionCall(TokenParser &parser) {
@@ -136,10 +142,15 @@ namespace xlang {
             return nullptr;
         }
 
-        std::unique_ptr<Scope> Scope::parseNestedScope(TokenParser &parser) {
-            auto result = make_unique<Scope>(getParentFunction(), this);
-            result->Parse(parser);
-            return result;
+        void Scope::parseNestedScope(TokenParser &parser, bool isRawBlock) {
+            auto scope = make_unique<Scope>(getParentFunction(), this, isRawBlock);
+            scope->Parse(parser);
+
+            auto call = unique_ptr<Instruction>(
+                    (Instruction * )(new CallInstruction(unique_ptr<Target>(new StrongTarget(*scope)))));
+            instructions.emplace_back(std::move(call));
+
+            scopes.push_back(std::move(scope));
         }
 
         const wstring &Scope::getScopeId() const {
@@ -236,6 +247,10 @@ namespace xlang {
 
         const vector<unique_ptr<Data>> &Scope::getData() const {
             return data;
+        }
+
+        const wstring &Scope::getRawCode() const {
+            return rawCode;
         }
     }
 }
