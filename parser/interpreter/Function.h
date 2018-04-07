@@ -17,9 +17,9 @@ namespace xlang {
     namespace interpreter {
 
         enum class CallingConvention {
-            cdecl,
-            stdcall,
-            unknown,
+            CDECL,
+            STDCALL,
+            UNKNOWN,
         };
 
         class Module;

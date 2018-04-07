@@ -62,9 +62,7 @@ namespace xlang {
                                         for (unsigned int i = 0; i < arguments.size(); i++) {
                                             if (arguments[i]->getDataType() != parameters[i]->getDataType()) {
                                                 Utils::throwError(
-                                                        L"Invalid argument supplied to " + function->getFunctionName() +
-                                                        L". Expected " + parameters[i]->getDataType() + L", but got " +
-                                                        arguments[i]->getDataType());
+                                                        L"Invalid argument supplied to " + function->getFunctionName());
                                             }
                                         }
                                     }

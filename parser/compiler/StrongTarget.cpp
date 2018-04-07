@@ -24,7 +24,7 @@ namespace xlang {
         }
 
         std::wstring StrongTarget::getScopeId() const {
-            if (type == StrongTargetType::scope) {
+            if (type == StrongTargetType::SCOPE) {
                 return target.scope->getScopeId();
             }
             return L"";
@@ -32,7 +32,7 @@ namespace xlang {
 
         const Function &StrongTarget::getFunction() const {
             const Function *function = nullptr;
-            if (type == StrongTargetType::scope) {
+            if (type == StrongTargetType::SCOPE) {
                 function = target.scope->getParentFunction();
             } else {
                 function = target.function;
@@ -46,10 +46,10 @@ namespace xlang {
         std::wstring StrongTarget::getFullPath() const {
 
             switch (type) {
-                case StrongTargetType::scope:
+                case StrongTargetType::SCOPE:
                     assert(target.scope);
                     return getPath(target.scope);
-                case StrongTargetType::function:
+                case StrongTargetType::FUNCTION:
                     assert(target.function);
                     return getPath(target.function);
             }
@@ -60,7 +60,7 @@ namespace xlang {
         std::wstring StrongTarget::getPath(const Scope *scope) const {
             std::wstring result = scope->getScopeId();
             if (auto function = scope->getParentFunction()) {
-                result = getPath(scope->getParentFunction()) + L"_" + result;
+                result = getPath(function) + L"_" + result;
             }
 
             return result;

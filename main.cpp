@@ -16,7 +16,8 @@ int main() {
     parser.Parse();
 
     Compiler<NasmX86Assembler> compiler(parser);
-    compiler.setDataStorageMode(DataStorageMode::scope);
+    compiler.setDataStorageMode(DataStorageMode::SCOPE);
+    
     auto translated = compiler.Compile();
     std::wcout << translated;
 

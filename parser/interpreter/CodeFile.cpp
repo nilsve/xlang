@@ -19,22 +19,14 @@ namespace xlang {
 
         using namespace utils;
 
-        void CodeFile::resolveImports() {
+        void CodeFile::Preprocess() {
             TokenParser parser(code);
             while (true) {
                 const Token token = parser.getToken(true);
 
                 if (!token.isStringLiteral) {
-                    if (token == L"#import") {
-                        const Token fileToken = parser.getToken(true);
-                        if (!fileToken.isStringLiteral) {
-                            parser.throwError("Expected a string literal after #include");
-                        } else {
-                            // Fix import
-                            auto &codeFile = this->parser.loadFile(fileToken.token);
-                            code.replace(token.position, fileToken.position + fileToken.token.length() + 2,
-                                         codeFile.code);
-                        }
+                    if (token == L"#") {
+                        handlePreProcessor(parser);
                     }
                 }
 
@@ -45,13 +37,13 @@ namespace xlang {
         }
 
         void CodeFile::Load() {
-            resolveImports();
+            Preprocess();
         }
 
-        std::wstring CodeFile::resolvePath(const std::wstring relativePath) {
+        std::wstring CodeFile::resolvePath(const std::wstring relativePath) const {
             char realPath[PATH_MAX];
 
-            string shortPath = utils::Utils::wstring_to_utf8(this->parser.workspace + relativePath);
+            string shortPath = utils::Utils::wstring_to_utf8(this->parser.getWorkspace() + relativePath);
 
             realpath(shortPath.c_str(), realPath);
 
@@ -64,6 +56,23 @@ namespace xlang {
 
         const std::wstring &CodeFile::getCode() const {
             return code;
+        }
+
+        void CodeFile::handlePreProcessor(TokenParser &parser) {
+            auto token = parser.getToken();
+            if (token == L"include") {
+                const Token fileToken = parser.getToken(true);
+                if (!fileToken.isStringLiteral) {
+                    parser.throwError("Expected a string literal after #include");
+                } else {
+                    // Fix import
+                    auto &codeFile = this->parser.loadFile(fileToken.token);
+                    code.replace(token.position - 1, fileToken.position + fileToken.token.length() + 2,
+                                 codeFile.code);
+                }
+            } else {
+                parser.throwError(L"Unknown preprocessor statement " + token.token);
+            }
         }
     }
 }

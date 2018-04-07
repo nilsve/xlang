@@ -9,25 +9,51 @@
 #include "../../utils/non_copyable.h"
 #include "TokenParser.h"
 #include <string>
+#include <map>
 
 namespace xlang {
     namespace interpreter {
+
+        enum class ModifierType {
+            UNKNOWN,
+            UNSIGNED,
+            SIGNED,
+        };
+
+        enum class DataType {
+            UNKNOWN,
+            CHAR,
+            INT,
+            FLOAT,
+            DOUBLE,
+        };
 
         class Scope;
 
         class Variable : public utils::non_copyable {
         private:
-            std::wstring dataType;
             const bool isFunctionArgument;
             std::wstring variableName;
-
-            int variableIndex = -1; // Variable index (offset) on scope / module
-
+            DataType dataType;
+            ModifierType modifierType;
             bool isPointer = false;
             bool isArray = false;
             size_t arrayLength = 0;
 
+            int variableIndex = -1; // Variable index (offset) on SCOPE / module
+
+
             bool validateVariable(std::string &result);
+
+            static std::map<std::wstring, ModifierType> modifierTypes;
+        public:
+            DataType getDataType() const;
+
+        private:
+            static std::map<std::wstring, DataType> dataTypes;
+
+            static DataType resolveDataType(const Token& token);
+            static ModifierType resolveModifierType(const Token &token);
 
         public:
             explicit Variable(bool isFunctionArgument = false) : isFunctionArgument(isFunctionArgument) {}
@@ -43,8 +69,6 @@ namespace xlang {
             void setVariableIndex(int variableIndex);
 
             int getVariableIndex() const;
-
-            const std::wstring &getDataType() const;
         };
     }
 }

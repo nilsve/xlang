@@ -4,7 +4,7 @@
 
 #include "Variable.h"
 
-#include <set>
+#include <map>
 #include <string>
 #include <sstream>
 
@@ -13,18 +13,32 @@ namespace xlang {
 
         using namespace std;
 
-        bool Variable::isVariableType(const Token &token) {
-            static set<wstring> dataTypes = {
-                    L"char",
-                    L"int"
-            };
+        map<wstring, ModifierType> Variable::modifierTypes = {
+                {L"unsigned", ModifierType::UNSIGNED},
+                {L"signed", ModifierType::SIGNED},
+        };
 
-            return dataTypes.find(token.token) != dataTypes.end();
+        map<wstring, DataType> Variable::dataTypes = {
+                {L"int", DataType::INT},
+                {L"char", DataType::CHAR},
+                {L"double", DataType::DOUBLE},
+                {L"float", DataType::FLOAT},
+        };
+
+        bool Variable::isVariableType(const Token &token) {
+            return resolveDataType(token) != DataType::UNKNOWN || resolveModifierType(token) != ModifierType::UNKNOWN;
         }
 
         void Variable::Parse(TokenParser &parser) {
             auto token = parser.getToken();
-            dataType = token.token;
+
+            auto modifierType = resolveModifierType(token);
+            if (modifierType != ModifierType::UNKNOWN) {
+
+            }
+
+            dataType = resolveDataType(token);
+
             token = parser.getToken();
 
             if (token == L"[" || token == L"*") {
@@ -42,7 +56,7 @@ namespace xlang {
                         token = parser.getToken();
 
                         if (token == L"]") {
-                            // Array of yet unknown length
+                            // Array of yet UNKNOWN length
                         } else {
 
                             if (isFunctionArgument) {
@@ -70,21 +84,6 @@ namespace xlang {
             }
 
             variableName = token.token;
-
-            /*if (!isFunctionArgument) {
-                // Function arguments can't have default values TODO
-
-                token = parser.peekToken(false);
-
-                if (token == L"=") {
-                    parser.eatToken(); // Remove previously peeked token
-
-                    // Directly initialize
-                    token = parser.getToken();
-
-                    //FIXME
-                }
-            }*/
 
             string errorMessage;
             if (validateVariable(errorMessage)) {
@@ -119,7 +118,23 @@ namespace xlang {
             return variableIndex;
         }
 
-        const wstring &Variable::getDataType() const {
+        ModifierType Variable::resolveModifierType(const Token &token) {
+            if (modifierTypes.find(token.token) != modifierTypes.end()) {
+                return modifierTypes[token.token];
+            } else {
+                return ModifierType::UNKNOWN;
+            }
+        }
+
+        DataType Variable::resolveDataType(const Token &token) {
+            if (dataTypes.find(token.token) != dataTypes.end()) {
+                return dataTypes[token.token];
+            } else {
+                return DataType::UNKNOWN;
+            }
+        }
+
+        DataType Variable::getDataType() const {
             return dataType;
         }
     }

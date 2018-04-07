@@ -30,7 +30,7 @@ namespace xlang {
             const interpreter::Parser &parser;
             const std::unique_ptr<InstructionValidator> validator;
             Assembler assembler;
-            interpreter::DataStorageMode dataStorageMode = interpreter::DataStorageMode::section;
+            interpreter::DataStorageMode dataStorageMode = interpreter::DataStorageMode::SECTION;
 
             std::vector<std::wstring> code;
             std::vector<std::wstring> data;
@@ -60,9 +60,8 @@ namespace xlang {
                 for (auto &module : modules) {
                     for (auto &function : module->getFunctions()) {
 
-                        StrongTarget target(*function->getRootScope());
-                        instructions::JmpInstruction jmp(
-                                std::unique_ptr<Target>((Target *) (new StrongTarget(*function->getRootScope()))));
+                        auto target = std::unique_ptr<Target>((Target *) (new StrongTarget(*function->getRootScope())));
+                        instructions::JmpInstruction jmp(std::move(target));
                         appendCodeBlock(
                                 assembler.assembleFunctionStart(*function) + L"\n" +
                                 assembler.assembleInstruction(jmp));
@@ -103,10 +102,10 @@ namespace xlang {
                 auto result = assembler.assembleData(data);
 
                 switch (dataStorageMode) {
-                    case interpreter::DataStorageMode::section:
+                    case interpreter::DataStorageMode::SECTION:
                         appendDataBlock(std::move(result));
                         break;
-                    case interpreter::DataStorageMode::scope:
+                    case interpreter::DataStorageMode::SCOPE:
                         appendCodeBlock(std::move(result));
                         break;
                     default:
@@ -133,13 +132,20 @@ namespace xlang {
 
                 compileModules(modules);
 
+                std::wstring result;
+
                 if (auto mainModule = findModule(modules, L"main")) {
                     if (auto mainFunction = findFunction(*mainModule, L"main")) {
-
+                        auto target = std::unique_ptr<Target>((Target*)new StrongTarget(*mainFunction));
+                        instructions::JmpInstruction jmp(std::move(target));
+                        result += assembler.assembleInstruction(jmp) + L"\n";
+                    } else {
+                        utils::Utils::throwError("Function `main` in module `main` not found!");
                     }
+                } else {
+                    utils::Utils::throwError("Module `main` not found!");
                 }
 
-                std::wstring result;
                 unsigned long size = 0;
                 for (std::wstring &block : code) {
                     size += block.size();

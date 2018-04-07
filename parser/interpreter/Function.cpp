@@ -26,7 +26,7 @@ namespace xlang {
 
             if (token != L"(") {
                 CallingConvention convention = getCallingConvention(token.token);
-                if (convention != CallingConvention::unknown) {
+                if (convention != CallingConvention::UNKNOWN) {
                     callingConvention = convention;
                 } else {
                     parser.throwError("Unexpected token after function name!");
@@ -75,11 +75,11 @@ namespace xlang {
 
         CallingConvention Function::getCallingConvention(const std::wstring &convention) {
             if (convention == L"cdecl") {
-                return CallingConvention::cdecl;
+                return CallingConvention::CDECL;
             } else if (convention == L"stdcall") {
-                return CallingConvention::stdcall;
+                return CallingConvention::STDCALL;
             } else {
-                return CallingConvention::unknown;
+                return CallingConvention::UNKNOWN;
             }
         }
 

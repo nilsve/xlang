@@ -17,7 +17,7 @@ namespace xlang {
             private:
                 std::unique_ptr<Target> target;
             public:
-                explicit JmpInstruction(std::unique_ptr<Target> _target) : target(std::move(_target)) {}
+                explicit JmpInstruction(std::unique_ptr<Target>&& _target) : target(std::move(_target)) {}
 
                 Target *getTarget() const {
                     return target.get();

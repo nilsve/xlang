@@ -16,8 +16,8 @@ namespace xlang {
     namespace interpreter {
 
         enum class DataStorageMode {
-            scope,
-            section,
+            SCOPE,
+            SECTION,
         };
 
         class Data : public utils::non_copyable {
