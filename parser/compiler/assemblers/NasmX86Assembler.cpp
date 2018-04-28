@@ -6,6 +6,7 @@
 #include "../instructions/CallInstruction.h"
 #include "../instructions/AssignInstruction.h"
 #include "../instructions/JmpInstruction.h"
+#include "../../interpreter/Variable.h"
 
 #include <iostream>
 #include <cassert>
@@ -40,9 +41,26 @@ namespace xlang {
 
                     if (auto target = assignInstruction->getTarget()) {
                         if (auto data = assignInstruction->getData()) {
-                            return L"mov DWORD eax, " + data->getDataId() + L"\n"
-                                                                            L"mov DWORD [ebp + " +
-                                   std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
+                            return  L"mov DWORD eax, " + data->getDataId() + L"\n"
+                                    L"mov DWORD [ebp + " + std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
+                        } else if (auto sourceVariable = assignInstruction->getSourceVariable()) {
+                            return L"mov DWORD eax, [ebp + " + std::to_wstring(getVariableIndex(sourceVariable->getVariableIndex()) * REGISTER_SIZE) + L"]"
+                                   L"mov DWORD [ebp + " + std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
+                        } else if (auto& constSimpleType = assignInstruction->getConstSimpleType()) {
+                            std::wstring result = L"mov ";
+                            switch (constSimpleType->getDataType()) {
+                                case interpreter::DataType::DOUBLE:
+                                case interpreter::DataType::FLOAT:
+                                case interpreter::DataType::INT:
+                                    result += L"DWORD";
+                                    break;
+                                case interpreter::DataType::CHAR:
+                                    assert(false); // TODO
+                                    break;
+                                case interpreter::DataType::UNKNOWN:
+                                    assert(false);
+                            }
+                            return result + L" [ebp + " + std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], " + constSimpleType->constSimpleData;
                         } else {
                             assert(false);
                         }

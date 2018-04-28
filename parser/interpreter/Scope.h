@@ -40,7 +40,7 @@ namespace xlang {
 
             void declareVariable(TokenParser &parser);
 
-            void updateVariable(TokenParser &parser, const Variable &variable);
+            void assignVariable(TokenParser &parser, const Variable &variable);
 
             const Variable *getVariable(const Token &token) const;
 
@@ -74,6 +74,8 @@ namespace xlang {
             bool getIsRawBlock() const;
 
             const std::wstring &getRawCode() const;
+
+            const Variable &parseArithmeticOperations(TokenParser &parser, const Token& token);
         };
     }
 }

@@ -15,11 +15,15 @@ namespace xlang {
 
             class AssignInstruction : public Instruction {
             private:
-                const interpreter::Variable *target;
-                const interpreter::Data *data;
+                const interpreter::Variable *target = nullptr;
+                const interpreter::Data *data = nullptr;
+                const interpreter::Variable *sourceVariable = nullptr;
+                const std::unique_ptr<interpreter::Variable> constSimpleType;
 
             public:
                 AssignInstruction(const interpreter::Variable &_target, const interpreter::Data &_data) : target(&_target), data(&_data) {}
+                AssignInstruction(const interpreter::Variable &_target, const interpreter::Variable &_sourceVariable) : target(&_target), sourceVariable(&_sourceVariable) {}
+                AssignInstruction(const interpreter::Variable &_target, std::unique_ptr<interpreter::Variable> _constSimpleType): target(&_target), constSimpleType(std::move(_constSimpleType)) {}
 
                 const interpreter::Variable *getTarget() const {
                     return target;
@@ -33,8 +37,16 @@ namespace xlang {
                     return data;
                 }
 
+                const interpreter::Variable *getSourceVariable() const {
+                    return sourceVariable;
+                }
+
                 void setData(const interpreter::Data *data) {
                     AssignInstruction::data = data;
+                }
+
+                const std::unique_ptr<interpreter::Variable> &getConstSimpleType() const {
+                    return constSimpleType;
                 }
             };
         }

@@ -11,6 +11,7 @@
 #include "../compiler/StrongTarget.h"
 #include "../compiler/WeakTarget.h"
 #include "../compiler/Target.h"
+#include "Variable.h"
 
 #include <cassert>
 #include <iostream>
@@ -45,7 +46,7 @@ namespace xlang {
                     declareVariable(parser);
                 } else if (auto variable = getVariable(token)) {
                     parser.eatToken();
-                    updateVariable(parser, *variable);
+                    assignVariable(parser, *variable);
                 } else {
                     // Function call
                     parseFunctionCall(parser);
@@ -169,7 +170,18 @@ namespace xlang {
             return scopes;
         }
 
-        void Scope::updateVariable(TokenParser &parser, const Variable &variable) {
+        const Variable& Scope::parseArithmeticOperations(TokenParser& parser, const Token& token) {
+            auto variable = make_unique<Variable>();
+            variable->markTemporary();
+
+            auto nextToken = parser.getToken(true);
+
+
+
+            return *variable;
+        }
+
+        void Scope::assignVariable(TokenParser &parser, const Variable &variable) {
 
             auto token = parser.getToken();
 
@@ -182,18 +194,30 @@ namespace xlang {
 
             token = parser.getToken(true);
 
-            const Data *_data = nullptr;
+            // Check if its a direct assignment without more stuff
+            auto nextToken = parser.peekToken();
+            if (nextToken == L";") {
+                const Data *_data = nullptr;
 
-            if (token.isStringLiteral) {
-                _data = &upsertData(token.token);
-            } else if (auto variable = getVariable(token)) {
-                assert(false); // Not implemented!
-            }
+                if (token.isStringLiteral) {
+                    if (auto sourceVariable = getVariable(token)) {
+                        instructions.push_back(std::make_unique<AssignInstruction>(variable, *sourceVariable));
+                    } else {
+                        instructions.push_back(std::make_unique<AssignInstruction>(variable, upsertData(token.token)));
+                    }
+                } else {
+                    // Number
+                    auto constSimpleData = make_unique<Variable>();
+                    constSimpleData->markTemporary();
+                    constSimpleData->setDataType(variable.getDataType());
+                    constSimpleData->setModifierType(variable.getModifierType());
+                    constSimpleData->constSimpleData = token.token;
+                    instructions.push_back(std::make_unique<AssignInstruction>(variable, std::move(constSimpleData)));
+                }
 
-            instructions.push_back(std::make_unique<AssignInstruction>(variable, *_data));
-
-            if (parser.getToken() != L";") {
-                parser.throwError("Expected ;");
+                if (parser.getToken() != L";") {
+                    parser.throwError("Expected ;");
+                }
             }
         }
 
@@ -207,7 +231,7 @@ namespace xlang {
             auto token = parser.peekToken();
             if (token == L"=") {
                 // Update variable
-                updateVariable(parser, *_var);
+                assignVariable(parser, *_var);
             } else if (token != L";") {
                 parser.throwError("Unexpected token after variable declaration!");
             } else {

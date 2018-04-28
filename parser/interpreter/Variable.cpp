@@ -137,5 +137,58 @@ namespace xlang {
         DataType Variable::getDataType() const {
             return dataType;
         }
+
+        bool Variable::supportsArithmeticOperator(const Token &token) {
+            if (getIsPointer()) {
+                return true;
+            } else {
+                switch (getDataType()) {
+                    case DataType::DOUBLE:
+                    case DataType::FLOAT:
+                    case DataType::INT:
+                    case DataType::CHAR:
+                        if (token == L"+" || token == L"-" || token == L"*" || token == L"/") {
+                            return true;
+                        }
+                        break;
+                    case DataType::UNKNOWN:
+                        assert(false);
+                        break;
+                    default:
+                        return false;
+                }
+            }
+
+            return false;
+        }
+
+        void Variable::setModifierType(ModifierType modifierType) {
+            Variable::modifierType = modifierType;
+        }
+
+        bool Variable::getIsPointer() const {
+            return isPointer;
+        }
+
+        void Variable::markTemporary() {
+            isPointer = false;
+            isTemporary = true;
+        }
+
+        bool Variable::getIsTemporary() const {
+            return isTemporary;
+        }
+
+        void Variable::setDataType(DataType dataType) {
+            Variable::dataType = dataType;
+        }
+
+        ModifierType Variable::getModifierType() const {
+            return modifierType;
+        }
+
+        void Variable::setModifierTypes(const map<wstring, ModifierType> &modifierTypes) {
+            Variable::modifierTypes = modifierTypes;
+        }
     }
 }
