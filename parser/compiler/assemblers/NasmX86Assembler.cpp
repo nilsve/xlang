@@ -31,9 +31,13 @@ namespace xlang {
 
                     std::wstring result;
 
-                    for (auto &parameter : callInstruction->getParameters()) {
-                        result += L"push DWORD [ebp + " + std::to_wstring(parameter->getVariableIndex()) + L"]\n";
-                    }
+					auto& parameters = callInstruction->getParameters();
+					if (parameters.size()) {
+						for (int i = parameters.size() - 1; i >= 0; i--) {
+							auto& parameter = parameters[i];
+							result += L"push DWORD [ebp + " + std::to_wstring(getVariableIndex(parameter->getVariableIndex()) * REGISTER_SIZE * -1) + L"]\n";
+						}
+					}
 
                     return result + L"call " + callInstruction->getTarget()->getFullPath();
                 } else if (auto assignInstruction = dynamic_cast<const compiler::instructions::AssignInstruction *>(&instruction)) {
@@ -42,7 +46,7 @@ namespace xlang {
                         if (auto data = assignInstruction->getData()) {
                             return L"mov DWORD eax, " + data->getDataId() + L"\n"
                                                                             L"mov DWORD [ebp + " +
-                                   std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
+                                   std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE * -1) + L"], eax";
                         } else {
                             assert(false);
                         }
