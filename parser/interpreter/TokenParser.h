@@ -44,10 +44,7 @@ namespace xlang {
             const Token peekToken(bool allowStringLiteral = false);
             std::wstring readUntill(wchar_t character);
 
-            template<typename T>
-            void throwError(T message) const {
-                return utils::Utils::throwError(message);
-            }
+            void throwError(const std::wstring& message) const;
 
             void eatToken();
 

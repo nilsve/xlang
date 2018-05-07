@@ -21,7 +21,7 @@ namespace xlang {
             this->moduleName = moduleName.token;
 
             if (parser.getToken() != L"{") {
-                parser.throwError("Expected { after module name");
+                parser.throwError(L"Expected { after module name");
             }
 
             while (true) {
@@ -58,10 +58,6 @@ namespace xlang {
 
         const std::vector<std::unique_ptr<Function>> &Module::getFunctions() const {
             return functions;
-        }
-
-        const std::vector<std::unique_ptr<Variable>> &Module::getVariables() const {
-            return variables;
         }
     }
 }

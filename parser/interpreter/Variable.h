@@ -50,7 +50,7 @@ namespace xlang {
             int variableIndex = -1; // Variable index (offset) on SCOPE / module
 
 
-            bool validateVariable(std::string &result);
+            bool validateVariable(std::wstring &result);
         public:
             explicit Variable(bool isFunctionArgument = false) : isFunctionArgument(isFunctionArgument) {}
 

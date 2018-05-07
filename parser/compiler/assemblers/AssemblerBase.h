@@ -25,12 +25,12 @@ namespace xlang {
                 virtual std::wstring assembleData(const interpreter::Data &data) const = 0;
 
                 virtual std::wstring assembleFunctionStart(const interpreter::Function &function) const {
-                    return function.getParent()->getModuleName() + L"_" + function.getFunctionName() + L":";
+                    return function.getParent()->getId() + L"_" + function.getId() + L":";
                 };
 
                 virtual std::wstring assembleScopeStart(const interpreter::Scope &scope) const {
-                    return scope.getParentFunction()->getParent()->getModuleName() + L"_" +
-                           scope.getParentFunction()->getFunctionName() + L"_" + scope.getScopeId();
+                    return scope.getParentFunction()->getParent()->getId() + L"_" +
+                           scope.getParentFunction()->getId() + L"_" + scope.getId();
                 };
             };
         }

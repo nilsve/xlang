@@ -22,7 +22,7 @@ namespace xlang {
         }
 
         bool InstructionValidator::findScopeId(const interpreter::Scope &rootScope, std::wstring scopeId) const {
-            if (rootScope.getScopeId() == scopeId) {
+            if (rootScope.getId() == scopeId) {
                 return true;
             } else {
                 auto &scopes = rootScope.getScopes();
@@ -50,7 +50,7 @@ namespace xlang {
                         }
 
                         for (auto &function : module->getFunctions()) {
-                            if (weakTarget->getFunctionName() == function->getFunctionName()) {
+                            if (weakTarget->getFunctionName() == function->getId()) {
                                 target.setCallingConvention(function->getCallingConvention());
 
                                 if (auto callInstruction = dynamic_cast<const CallInstruction *>(&instruction)) {
@@ -62,7 +62,7 @@ namespace xlang {
                                         for (unsigned int i = 0; i < arguments.size(); i++) {
                                             if (arguments[i]->getDataType() != parameters[i]->getDataType()) {
                                                 Utils::throwError(
-                                                        L"Invalid argument supplied to " + function->getFunctionName());
+                                                        L"Invalid argument supplied to " + function->getId());
                                             }
                                         }
                                     }

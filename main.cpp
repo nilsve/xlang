@@ -17,7 +17,7 @@ int main() {
 
     srand(0); // Predictable scope names etc
 
-    Parser parser(L"/Users/nilsvaneijk/Desktop/test/", L"main.x");
+    Parser parser(L"/Users/nils.van.eijk/Desktop/test/", L"main.x");
     parser.Parse();
 
     Compiler<NasmX86Assembler> compiler(parser);

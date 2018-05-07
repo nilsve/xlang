@@ -48,7 +48,7 @@ namespace xlang {
 
             const interpreter::Function *findFunction(const interpreter::Module &module, const std::wstring &functionName) const {
                 for (auto &function : module.getFunctions()) {
-                    if (function->getFunctionName() == functionName) {
+                    if (function->getId() == functionName) {
                         return function.get();
                     }
                 }

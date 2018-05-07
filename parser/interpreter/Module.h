@@ -9,29 +9,27 @@
 #include "TokenParser.h"
 #include "Function.h"
 #include "Variable.h"
+#include "Container.h"
 #include <vector>
 
 namespace xlang {
     namespace interpreter {
 
-        class Module : public utils::non_copyable {
+        class Module : public Container, public utils::non_copyable {
         private:
             std::wstring moduleName;
             std::vector<std::unique_ptr<Function>> functions;
-            std::vector<std::unique_ptr<Variable>> variables;
 
             void parseFunction(TokenParser &parser);
 
             void parseVariable(TokenParser &parser);
 
         public:
-            void Parse(TokenParser &parser);
+            void Parse(TokenParser &parser) override;
 
             std::wstring getModuleName() const;
 
             const std::vector<std::unique_ptr<Function>> &getFunctions() const;
-
-            const std::vector<std::unique_ptr<Variable>> &getVariables() const;
         };
     }
 }
