@@ -38,7 +38,7 @@ namespace xlang {
             const interpreter::Module *
             findModule(const std::vector<std::unique_ptr<interpreter::Module>> &modules, const std::wstring &moduleName) const {
                 for (auto &module : modules) {
-                    if (module->getModuleName() == moduleName) {
+                    if (module->getId() == moduleName) {
                         return module.get();
                     }
                 }
@@ -76,7 +76,10 @@ namespace xlang {
             void compileScope(const interpreter::Scope &scope) {
 
                 for (auto &data : scope.getData()) {
-                    compileData(*data);
+                    // Numbers get inlined
+                    if (!data->getIsNumber()) {
+                        compileData(*data);
+                    }
                 }
 
                 std::wstring scopeCode;

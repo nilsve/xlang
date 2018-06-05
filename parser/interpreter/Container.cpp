@@ -4,14 +4,22 @@
 
 #include <memory>
 #include "Container.h"
+#include "Module.h"
+#include "../compiler/instructions/CallInstruction.h"
 #include "../compiler/instructions/AssignInstruction.h"
+#include "../compiler/StrongTarget.h"
+#include "../compiler/WeakTarget.h"
+#include "../compiler/Target.h"
 #include "../../utils/Utils.h"
+#include "VariableLink.h"
+
 #include <string>
 
 namespace xlang {
     namespace interpreter {
         using namespace std;
         using namespace compiler::instructions;
+        using namespace compiler;
 
         const std::wstring &Container::getId() const {
             return id;
@@ -36,6 +44,78 @@ namespace xlang {
             return nullptr;
         }
 
+        void Container::parseFunctionCall(TokenParser &parser) {
+            auto token = parser.getToken();
+
+            vector<VariableLink> arguments;
+            wstring moduleName;
+            wstring functionName = token.token;
+
+            token = parser.getToken();
+
+            if (token == L".") {
+                // Function name isn't function name but module name
+                moduleName = std::move(functionName);
+                token = parser.getToken();
+                functionName = token.token;
+                token = parser.getToken();
+            } else {
+
+                const Module* module = nullptr;
+                const Container* currentContainer = dynamic_cast<const Container*>(this);
+
+                while (true) {
+                    module = dynamic_cast<const Module*>(currentContainer);
+
+                    if (module) {
+                        break;
+                    } else {
+                        currentContainer = currentContainer->getParent();
+                    }
+                }
+
+                if (!module) {
+                    parser.throwError(L"Parent module not found!");
+                } else {
+                    moduleName = module->getId();
+                }
+            }
+
+            if (token != L"(") {
+                parser.throwError(L"Expected ( after functionname");
+            }
+
+            token = parser.getToken();
+
+            while (token != L")") {
+                // Handle arguments
+
+                const Variable *argument = nullptr;
+                if (!(argument = Container::getVariable(token))) {
+                    return parser.throwError(L"Unknown variable " + token.token);
+                }
+
+                arguments.emplace_back(*argument, false);
+
+                token = parser.getToken();
+
+                // comma expected
+                if (token != L",") {
+                    break;
+                }
+
+                token = parser.getToken();
+            }
+            if (parser.getToken() != L";") {
+                parser.throwError(L"Expected ; after function call!");
+            }
+
+            auto call = unique_ptr<Instruction>((Instruction * )(new CallInstruction(
+                    unique_ptr<Target>((Target * )(new WeakTarget(moduleName, functionName))), std::move(arguments))));
+
+            instructions.push_back(std::move(call));
+        }
+
         const std::vector<std::unique_ptr<Variable>> &Container::getVariables() const {
             return variables;
         }
@@ -45,28 +125,35 @@ namespace xlang {
             auto token = parser.getToken(true);
 
             if (token == L"(") {
-                auto& variable = variables.emplace_back(new Variable());
+                auto& variable = variables.emplace_back(make_unique<Variable>());
                 parseArithmeticBlock(parser, *variable, false);
                 auto assignInstruction = unique_ptr<Instruction>((Instruction * )(new AssignInstruction(targetVariable, *variable)));
                 instructions.push_back(std::move(assignInstruction));
             } else {
                 do {
-                    if (token.isStringLiteral) {
-                        if (auto sourceVariable = getVariable(token)) {
-                            instructions.push_back(std::make_unique<AssignInstruction>(targetVariable, *sourceVariable));
-                        } else {
-                            instructions.push_back(std::make_unique<AssignInstruction>(targetVariable, upsertData(token.token)));
-                        }
-                    } else if (utils::Utils::isNumber(token.token)) {
-                        // Number
-                        auto constSimpleData = make_unique<Variable>();
-                        constSimpleData->markTemporary();
-                        constSimpleData->setDataType(targetVariable.getDataType());
-                        constSimpleData->setModifierType(targetVariable.getModifierType());
-                        constSimpleData->constSimpleData = token.token;
-                        instructions.push_back(std::make_unique<AssignInstruction>(targetVariable, std::move(constSimpleData)));
-                    } else {
+                    const Variable* var = nullptr;
+                    const Data* data = nullptr;
 
+                    if (!utils::Utils::isNumber(token.token)) {
+                        if (token.isStringLiteral) {
+                            data = &upsertData(token);
+                        } else {
+                            if (auto sourceVariable = getVariable(token)) {
+                                var = sourceVariable;
+                            } else {
+                                parser.throwError(L"Unknown variable " + std::wstring(token.token));
+                            }
+                        }
+                    } else {
+                        data = &upsertData(token);
+                    }
+
+                    if (data) {
+                        instructions.push_back(std::make_unique<AssignInstruction>(targetVariable, *data));
+                    } else if (var) {
+                        instructions.push_back(std::make_unique<AssignInstruction>(targetVariable, *var));
+                    } else {
+                        assert(false);
                     }
 
                     token = parser.getToken(true);
@@ -86,7 +173,7 @@ namespace xlang {
 
             assert(token == L"=");
 
-            parseArithmeticBlock(parser, targetVariable);
+            parseArithmeticBlock(parser, targetVariable, true);
         }
 
         void Container::declareVariable(TokenParser &parser) {
@@ -112,20 +199,27 @@ namespace xlang {
             }
         }
 
-        template<typename T>
-        const Data &Container::upsertData(T search) {
+        const Data &Container::upsertData(const Token& token) {
             for (auto &d : data) {
-                if (*d == search) {
+                if (d->getIsNumber() == !token.isStringLiteral && *d == token.token) {
                     return *d;
                 }
             }
 
-            auto d = make_unique<Data>();
-            *d = search;
+            auto d = make_unique<Data>(!token.isStringLiteral);
+            *d = token.token;
 
             data.push_back(std::move(d));
 
             return *data.back();
+        }
+
+        const vector<unique_ptr<Data>> &Container::getData() const {
+            return data;
+        }
+
+        const vector<unique_ptr<Instruction>> &Container::getInstructions() const {
+            return instructions;
         }
     }
 }

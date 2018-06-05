@@ -22,8 +22,7 @@ namespace xlang {
             std::vector<std::unique_ptr<Variable>> variables;
             std::vector<std::unique_ptr<compiler::instructions::Instruction>> instructions;
 
-            template<typename T>
-            const Data &upsertData(T search);
+            const Data &upsertData(const Token& search);
 
         public:
             Container() {}
@@ -42,13 +41,19 @@ namespace xlang {
                 return getVariable(token.token);
             }
 
-            const Variable *getVariable(const std::wstring& name) const;
+            virtual const Variable *getVariable(const std::wstring& name) const;
 
             void parseArithmeticBlock(TokenParser &parser, const Variable &targetVariable, bool isRootBlock);
 
             void assignVariable(TokenParser &parser, const Variable &targetVariable);
 
             void declareVariable(TokenParser &parser);
+
+            const std::vector<std::unique_ptr<Data>> &getData() const;
+
+            const std::vector<std::unique_ptr<compiler::instructions::Instruction>> &getInstructions() const;
+
+            void parseFunctionCall(TokenParser &parser);
         };
     }
 }

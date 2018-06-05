@@ -18,7 +18,7 @@ namespace xlang {
 
             auto moduleName = parser.getToken(true);
 
-            this->moduleName = moduleName.token;
+            this->id = moduleName.token;
 
             if (parser.getToken() != L"{") {
                 parser.throwError(L"Expected { after module name");
@@ -33,27 +33,17 @@ namespace xlang {
                 } else if (token == L"function") {
                     parseFunction(parser);
                 } else if (Variable::isVariableType(token)) {
-                    parseVariable(parser);
+                    declareVariable(parser);
                 } else {
                     return parser.throwError(L"Unexpected token " + token.token);
                 }
             }
         }
 
-        void Module::parseVariable(TokenParser &parser) {
-            auto variable = make_unique<Variable>();
-            variable->Parse(parser);
-            variables.push_back(std::move(variable));
-        }
-
         void Module::parseFunction(TokenParser &parser) {
             auto function = make_unique<Function>(this);
             function->Parse(parser);
             functions.push_back(std::move(function));
-        }
-
-        std::wstring Module::getModuleName() const {
-            return moduleName;
         }
 
         const std::vector<std::unique_ptr<Function>> &Module::getFunctions() const {

@@ -17,7 +17,6 @@ namespace xlang {
 
         class Module : public Container, public utils::non_copyable {
         private:
-            std::wstring moduleName;
             std::vector<std::unique_ptr<Function>> functions;
 
             void parseFunction(TokenParser &parser);
@@ -26,8 +25,6 @@ namespace xlang {
 
         public:
             void Parse(TokenParser &parser) override;
-
-            std::wstring getModuleName() const;
 
             const std::vector<std::unique_ptr<Function>> &getFunctions() const;
         };

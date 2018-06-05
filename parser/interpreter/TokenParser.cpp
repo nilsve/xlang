@@ -113,6 +113,7 @@ namespace xlang {
             }
 
             throwError(std::wstring(L"End character ") + character + std::wstring(L"not found!"));
+            return L"";//unreachable
         }
 
         // TODO: Refactor this trash...

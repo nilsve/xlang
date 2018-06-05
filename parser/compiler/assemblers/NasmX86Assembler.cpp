@@ -33,7 +33,7 @@ namespace xlang {
                     std::wstring result;
 
                     for (auto &parameter : callInstruction->getParameters()) {
-                        result += L"push DWORD [ebp + " + std::to_wstring(parameter->getVariableIndex()) + L"]\n";
+                        result += L"push DWORD [ebp + " + std::to_wstring(parameter.variable.getVariableIndex()) + L"]\n";
                     }
 
                     return result + L"call " + callInstruction->getTarget()->getFullPath();
@@ -41,12 +41,17 @@ namespace xlang {
 
                     if (auto target = assignInstruction->getTarget()) {
                         if (auto data = assignInstruction->getData()) {
-                            return  L"mov DWORD eax, " + data->getDataId() + L"\n"
-                                    L"mov DWORD [ebp + " + std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
+                            if (data->getIsNumber()) {
+                                return  L"mov DWORD [ebp + " + std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], " + data->getDataAsString();
+                            } else {
+                                return  L"mov DWORD eax, " + data->getDataId() + L"\n"
+                                        L"mov DWORD [ebp + " + std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
+                            }
+
                         } else if (auto sourceVariable = assignInstruction->getSourceVariable()) {
                             return L"mov DWORD eax, [ebp + " + std::to_wstring(getVariableIndex(sourceVariable->getVariableIndex()) * REGISTER_SIZE) + L"]"
                                    L"mov DWORD [ebp + " + std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
-                        } else if (auto& constSimpleType = assignInstruction->getConstSimpleType()) {
+                        } /* else if (auto& constSimpleType = assignInstruction->getConstSimpleType()) {
                             std::wstring result = L"mov ";
                             switch (constSimpleType->getDataType()) {
                                 case interpreter::DataType::DOUBLE:
@@ -61,7 +66,7 @@ namespace xlang {
                                     assert(false);
                             }
                             return result + L" [ebp + " + std::to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], " + constSimpleType->constSimpleData;
-                        } else {
+                        }*/ else {
                             assert(false);
                         }
                     } else {
@@ -116,17 +121,7 @@ namespace xlang {
                 std::wstringstream stream;
                 stream << data.getDataId() << L": db ";
 
-                auto &bytes = data.getData();
-
-//                bool first = true;
                 for (auto chr : data.getData()) {
-
-//                    if (!first) {
-//                        stream << L",";
-//                    } else {
-//                        first = false;
-//                    }
-
                     stream << L"0x" << std::hex << std::setw(2) << std::setfill(L'0') << int(chr) << L",";
                 }
 

@@ -54,8 +54,6 @@ namespace xlang {
         public:
             explicit Variable(bool isFunctionArgument = false) : isFunctionArgument(isFunctionArgument) {}
 
-            std::wstring constSimpleData;
-
             void markTemporary();
 
             void Parse(TokenParser &parser);

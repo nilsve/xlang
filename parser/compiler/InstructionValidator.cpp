@@ -44,7 +44,7 @@ namespace xlang {
                 }
 
                 for (auto &module : parser.getModules()) {
-                    if (module->getModuleName() == weakTarget->getModuleName()) {
+                    if (module->getId() == weakTarget->getModuleName()) {
                         if (!weakTarget->getFunctionName().length()) {
                             return;
                         }
@@ -60,7 +60,7 @@ namespace xlang {
                                         auto &arguments = callInstruction->getParameters();
                                         auto &parameters = function->getParameters();
                                         for (unsigned int i = 0; i < arguments.size(); i++) {
-                                            if (arguments[i]->getDataType() != parameters[i]->getDataType()) {
+                                            if (arguments[i].variable.getDataType() != parameters[i]->getDataType()) {
                                                 Utils::throwError(
                                                         L"Invalid argument supplied to " + function->getId());
                                             }

@@ -31,27 +31,17 @@ namespace xlang {
 
             void parseNestedScope(TokenParser &parser, bool isRawBlock = false);
 
-            void parseFunctionCall(TokenParser &parser);
-
             unsigned int calculateVariableIndex() const override;
         public:
             Scope(const Container *_parent, bool _isAsmBlock = false) : Container(utils::Utils::generateUuid(), _parent), isRawBlock(_isAsmBlock) {}
 
             void Parse(TokenParser &parser) override;
 
-            const std::vector<std::unique_ptr<compiler::instructions::Instruction>> &getInstructions() const;
-
             const std::vector<std::unique_ptr<Scope>> &getScopes() const;
 
-            const Variable *getVariable(const std::wstring& name) const;
-            const Variable *getVariable(const Token& token) const {
-                return getVariable(token.token);
-            };
+            const Variable *getVariable(const std::wstring& name) const override;
 
-            const std::vector<std::unique_ptr<Data>> &getData() const;
             const Function* getParentFunction() const;
-
-
 
             bool getIsRawBlock() const;
 
