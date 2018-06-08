@@ -21,6 +21,8 @@ namespace xlang {
                 ADD,
             };
 
+
+
             class AssignInstruction : public Instruction {
             private:
                 const interpreter::Variable *target = nullptr;
@@ -35,6 +37,14 @@ namespace xlang {
 
                 const interpreter::Variable *getTarget() const {
                     return target;
+                }
+
+                ArithmeticType getArithmeticOperation() const {
+                    return arithmeticOperation;
+                }
+
+                void setArithmeticOperation(ArithmeticType arithmeticOperation) {
+                    AssignInstruction::arithmeticOperation = arithmeticOperation;
                 }
 
                 const interpreter::Data *getData() const {

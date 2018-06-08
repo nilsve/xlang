@@ -14,6 +14,7 @@
 #include "VariableLink.h"
 
 #include <string>
+#include <set>
 
 namespace xlang {
     namespace interpreter {
@@ -68,44 +69,45 @@ namespace xlang {
                     module = dynamic_cast<const Module*>(currentContainer);
 
                     if (module) {
+                        moduleName = module->getId();
                         break;
                     } else {
                         currentContainer = currentContainer->getParent();
+                        if (!currentContainer) {
+                            parser.throwError(L"Parent module not found!");
+                        }
                     }
                 }
 
-                if (!module) {
-                    parser.throwError(L"Parent module not found!");
-                } else {
-                    moduleName = module->getId();
-                }
             }
 
             if (token != L"(") {
                 parser.throwError(L"Expected ( after functionname");
             }
 
-            token = parser.getToken();
+            token = parser.peekToken(true);
 
             while (token != L")") {
-                // Handle arguments
+                auto& variable = createVariable(true);
 
-                const Variable *argument = nullptr;
-                if (!(argument = Container::getVariable(token))) {
-                    return parser.throwError(L"Unknown variable " + token.token);
+                auto tokens = parser.getTokens({L",", L")"});
+
+                if (!tokens.size()) {
+                    parser.throwError(L"Empty argument");
                 }
 
-                arguments.emplace_back(*argument, false);
+                auto start = tokens.begin();
+                auto end = tokens.end();
 
-                token = parser.getToken();
+                parseArithmeticBlock(start, end, variable, true);
 
-                // comma expected
-                if (token != L",") {
-                    break;
-                }
+                arguments.push_back({variable, false});
 
-                token = parser.getToken();
+                token = parser.peekToken(true);
             }
+
+            parser.eatToken();
+
             if (parser.getToken() != L";") {
                 parser.throwError(L"Expected ; after function call!");
             }
@@ -120,20 +122,24 @@ namespace xlang {
             return variables;
         }
 
-        void Container::parseArithmeticBlock(TokenParser& parser, const Variable& targetVariable, bool isRootBlock = true) {
+        void Container::parseArithmeticBlock(std::vector<const Token>::iterator& startToken, std::vector<const Token>::iterator& endToken, const Variable& targetVariable, bool isRootBlock = true) {
 
-            auto token = parser.getToken(true);
+            // Start out with assign
+            ArithmeticType type = ArithmeticType::ASSIGN;
 
-            if (token == L"(") {
-                auto& variable = variables.emplace_back(make_unique<Variable>());
-                parseArithmeticBlock(parser, *variable, false);
-                auto assignInstruction = unique_ptr<Instruction>((Instruction * )(new AssignInstruction(targetVariable, *variable)));
-                instructions.push_back(std::move(assignInstruction));
-            } else {
-                do {
-                    const Variable* var = nullptr;
-                    const Data* data = nullptr;
+            // Parse all tokens
+            while (startToken != endToken) {
+                auto token = *startToken;
+                unique_ptr<AssignInstruction> assignInstruction;
 
+                const Variable* var = nullptr;
+                const Data* data = nullptr;
+
+                if (token == L"(") {
+                    startToken++;
+                    var = &createVariable(false);
+                    parseArithmeticBlock(startToken, endToken, *var, false);
+                } else {
                     if (!utils::Utils::isNumber(token.token)) {
                         if (token.isStringLiteral) {
                             data = &upsertData(token);
@@ -141,24 +147,49 @@ namespace xlang {
                             if (auto sourceVariable = getVariable(token)) {
                                 var = sourceVariable;
                             } else {
-                                parser.throwError(L"Unknown variable " + std::wstring(token.token));
+                                //FIXME
+                                assert(false);
+//                                    parser.throwError(L"Unknown variable " + std::wstring(token.token));
                             }
                         }
                     } else {
                         data = &upsertData(token);
                     }
+                }
 
-                    if (data) {
-                        instructions.push_back(std::make_unique<AssignInstruction>(targetVariable, *data));
-                    } else if (var) {
-                        instructions.push_back(std::make_unique<AssignInstruction>(targetVariable, *var));
+                if (data) {
+                    assignInstruction = std::make_unique<AssignInstruction>(targetVariable, *data);
+                } else if (var) {
+                    assignInstruction = std::make_unique<AssignInstruction>(targetVariable, *var);
+                } else {
+                    assert(false);
+                }
+
+                assignInstruction->setArithmeticOperation(type);
+                instructions.push_back(std::move(assignInstruction));
+
+                startToken++;
+
+                if (startToken != endToken) {
+                    token = *startToken;
+
+                    if (token == L"+") {
+                        type = ArithmeticType::ADD;
+                    } else if (token == L"-") {
+                        type = ArithmeticType::SUBSTRACT;
+                    } else if (token == L"*") {
+                        type = ArithmeticType::MULTIPLY;
+                    } else if (token == L"/") {
+                        type = ArithmeticType::DIVIDE;
+                    } else if (!isRootBlock && token == L")") {
+                        return;
                     } else {
+                        // FIXME: Moet een exception zijn
                         assert(false);
                     }
 
-                    token = parser.getToken(true);
-
-                } while (!(token == L")" || (isRootBlock && token == L";")));
+                    startToken++;
+                }
             }
         }
 
@@ -173,7 +204,13 @@ namespace xlang {
 
             assert(token == L"=");
 
-            parseArithmeticBlock(parser, targetVariable, true);
+            auto tokens = parser.getTokens({L";"});
+            parser.eatToken();
+
+            auto start = tokens.begin();
+            auto end = tokens.end();
+
+            parseArithmeticBlock(start, end, targetVariable, true);
         }
 
         void Container::declareVariable(TokenParser &parser) {

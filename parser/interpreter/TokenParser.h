@@ -5,9 +5,11 @@
 #ifndef XLANG_TOKENPARSER_H
 #define XLANG_TOKENPARSER_H
 
-#include <string>
 #include "../../utils/non_copyable.h"
 #include "../../utils/Utils.h"
+
+#include <string>
+#include <set>
 
 namespace xlang {
     namespace interpreter {
@@ -40,6 +42,7 @@ namespace xlang {
         public:
             explicit TokenParser(const std::wstring &code) : code(code) {}
 
+            const std::vector<const Token> getTokens(const std::set<std::wstring>& untill);
             const Token getToken(bool allowStringLiteral = false);
             const Token peekToken(bool allowStringLiteral = false);
             std::wstring readUntill(wchar_t character);

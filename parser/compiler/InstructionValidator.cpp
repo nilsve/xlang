@@ -61,8 +61,8 @@ namespace xlang {
                                         auto &parameters = function->getParameters();
                                         for (unsigned int i = 0; i < arguments.size(); i++) {
                                             if (arguments[i].variable.getDataType() != parameters[i]->getDataType()) {
-                                                Utils::throwError(
-                                                        L"Invalid argument supplied to " + function->getId());
+                                                // TODO
+//                                                Utils::throwError(L"Invalid argument supplied to " + function->getId());
                                             }
                                         }
                                     }

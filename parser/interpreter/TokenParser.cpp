@@ -4,7 +4,9 @@
 
 #include "TokenParser.h"
 #include "../../utils/Utils.h"
+
 #include <iostream>
+#include <set>
 
 using namespace std;
 
@@ -149,6 +151,23 @@ namespace xlang {
             }
 
             return utils::Utils::throwError(message + L"\n\n" + text);
+        }
+
+        const std::vector<const Token> TokenParser::getTokens(const std::set<std::wstring>& untill) {
+            std::vector<const Token> result;
+
+            while (true) {
+                auto token = peekToken(true);
+
+                if (untill.find(token.token) != untill.end() || token == L";") {
+                    break;
+                } else {
+                    eatToken();
+                    result.push_back(std::move(token));
+                }
+            }
+
+            return result;
         }
 
         bool Token::operator==(const std::wstring &other) const {

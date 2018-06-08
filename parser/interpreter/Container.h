@@ -41,9 +41,17 @@ namespace xlang {
                 return getVariable(token.token);
             }
 
+            Variable& createVariable(bool isFunctionArgument) {
+                auto index = calculateVariableIndex();
+                variables.push_back(std::make_unique<Variable>(isFunctionArgument));
+                auto& variable = variables.back();
+                variable->setVariableIndex(index);
+                return *variable;
+            }
+
             virtual const Variable *getVariable(const std::wstring& name) const;
 
-            void parseArithmeticBlock(TokenParser &parser, const Variable &targetVariable, bool isRootBlock);
+            void parseArithmeticBlock(std::vector<const Token>::iterator& startToken, std::vector<const Token>::iterator& endToken, const Variable &targetVariable, bool isRootBlock);
 
             void assignVariable(TokenParser &parser, const Variable &targetVariable);
 
