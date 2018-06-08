@@ -20,7 +20,7 @@ namespace xlang {
             assert(parser.getToken() == L"function");
 
             auto functionName = parser.getToken();
-            this->functionName = functionName.token;
+            this->id = functionName.token;
 
             auto token = parser.getToken();
 
@@ -29,14 +29,14 @@ namespace xlang {
                 if (convention != CallingConvention::UNKNOWN) {
                     callingConvention = convention;
                 } else {
-                    parser.throwError("Unexpected token after function name!");
+                    parser.throwError(L"Unexpected token after function name!");
                 }
 
                 token = parser.getToken();
             }
 
             if (token != L"(") {
-                parser.throwError("Expected (");
+                parser.throwError(L"Expected (");
             }
 
             if (parser.peekToken(false) != L")") {
@@ -69,7 +69,7 @@ namespace xlang {
         }
 
         void Function::parseBody(TokenParser &parser) {
-            rootScope = make_unique<Scope>(this, nullptr);
+            rootScope = make_unique<Scope>(this);
             rootScope->Parse(parser);
         }
 
@@ -81,10 +81,6 @@ namespace xlang {
             } else {
                 return CallingConvention::UNKNOWN;
             }
-        }
-
-        const wstring &Function::getFunctionName() const {
-            return functionName;
         }
 
         CallingConvention Function::getCallingConvention() const {
@@ -101,10 +97,6 @@ namespace xlang {
 
         const unique_ptr<Scope> &Function::getRootScope() const {
             return rootScope;
-        }
-
-        const Module *Function::getParent() const {
-            return parent;
         }
     }
 }

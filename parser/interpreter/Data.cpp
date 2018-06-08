@@ -20,6 +20,8 @@ namespace xlang {
 
         bool Data::operator==(const Data &other) const {
 
+            return *this == other.data;
+
             if (other.data.size() != data.size()) {
                 return false;
             } else {
@@ -47,6 +49,14 @@ namespace xlang {
 
         const std::wstring &Data::getDataId() const {
             return dataId;
+        }
+
+        bool Data::getIsNumber() const {
+            return isNumber;
+        }
+
+        std::wstring Data::getDataAsString() const {
+            return std::wstring(data.begin(), data.end()) + L"";
         }
     }
 }

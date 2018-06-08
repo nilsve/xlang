@@ -4,7 +4,9 @@
 
 #include "TokenParser.h"
 #include "../../utils/Utils.h"
+
 #include <iostream>
+#include <set>
 
 using namespace std;
 
@@ -45,13 +47,14 @@ namespace xlang {
 
             for (; position < code.length(); position++) {
                 const wchar_t chr = code[position];
+
                 if (stringLiteral || !isWhitespace(chr)) {
 
                     if (!stringLiteral && getStringLiteral(chr)) {
                         // Begin string literal
 
                         if (!allowStringLiteral) {
-                            throwError("Unexpected string literal!");
+                            throwError(L"Unexpected string literal!");
                         }
 
                         token.isStringLiteral = stringLiteral = chr;
@@ -70,7 +73,7 @@ namespace xlang {
                             break;
                         } else if (chr == '\n') {
                             // Fout!
-                            throwError("Unexpected newline in string literal!");
+                            throwError(L"Unexpected newline in string literal!");
                         }
                     } else if (isSpecialChar(chr)) {
                         position++;
@@ -112,6 +115,59 @@ namespace xlang {
             }
 
             throwError(std::wstring(L"End character ") + character + std::wstring(L"not found!"));
+            return L"";//unreachable
+        }
+
+        // TODO: Refactor this trash...
+        void TokenParser::throwError(const std::wstring &message) const {
+            wstring text;
+            text.reserve(256);// magic number...
+            unsigned short newLineCount = 0;
+            for (auto i = position; i > 0; i--) {
+                if (code[i] == L'\n') {
+                    newLineCount++;
+                    if (newLineCount > 1) {
+                        break;
+                    } else if (newLineCount == 1) {
+                        text += L">>>>";
+                    }
+                }
+
+                text += code[i];
+            }
+
+            reverse(text.rbegin(), text.rend());
+
+            newLineCount = 0;
+            for (auto i = position + 1; i < code.length(); i++) {
+                if (code[i] == L'\n') {
+                    newLineCount++;
+                    if (newLineCount > 1) {
+                        break;
+                    }
+                }
+
+                text += code[i];
+            }
+
+            return utils::Utils::throwError(message + L"\n\n" + text);
+        }
+
+        const std::vector<const Token> TokenParser::getTokens(const std::set<std::wstring>& untill) {
+            std::vector<const Token> result;
+
+            while (true) {
+                auto token = peekToken(true);
+
+                if (untill.find(token.token) != untill.end() || token == L";") {
+                    break;
+                } else {
+                    eatToken();
+                    result.push_back(std::move(token));
+                }
+            }
+
+            return result;
         }
 
         bool Token::operator==(const std::wstring &other) const {

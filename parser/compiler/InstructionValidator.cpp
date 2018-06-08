@@ -22,7 +22,7 @@ namespace xlang {
         }
 
         bool InstructionValidator::findScopeId(const interpreter::Scope &rootScope, std::wstring scopeId) const {
-            if (rootScope.getScopeId() == scopeId) {
+            if (rootScope.getId() == scopeId) {
                 return true;
             } else {
                 auto &scopes = rootScope.getScopes();
@@ -44,13 +44,13 @@ namespace xlang {
                 }
 
                 for (auto &module : parser.getModules()) {
-                    if (module->getModuleName() == weakTarget->getModuleName()) {
+                    if (module->getId() == weakTarget->getModuleName()) {
                         if (!weakTarget->getFunctionName().length()) {
                             return;
                         }
 
                         for (auto &function : module->getFunctions()) {
-                            if (weakTarget->getFunctionName() == function->getFunctionName()) {
+                            if (weakTarget->getFunctionName() == function->getId()) {
                                 target.setCallingConvention(function->getCallingConvention());
 
                                 if (auto callInstruction = dynamic_cast<const CallInstruction *>(&instruction)) {
@@ -60,9 +60,9 @@ namespace xlang {
                                         auto &arguments = callInstruction->getParameters();
                                         auto &parameters = function->getParameters();
                                         for (unsigned int i = 0; i < arguments.size(); i++) {
-                                            if (arguments[i]->getDataType() != parameters[i]->getDataType()) {
-                                                Utils::throwError(
-                                                        L"Invalid argument supplied to " + function->getFunctionName());
+                                            if (arguments[i].variable.getDataType() != parameters[i]->getDataType()) {
+                                                // TODO
+//                                                Utils::throwError(L"Invalid argument supplied to " + function->getId());
                                             }
                                         }
                                     }

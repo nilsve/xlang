@@ -32,6 +32,12 @@ namespace xlang {
 
         class Variable : public utils::non_copyable {
         private:
+            static std::map<std::wstring, ModifierType> modifierTypes;
+            static std::map<std::wstring, DataType> dataTypes;
+
+            static DataType resolveDataType(const Token& token);
+            static ModifierType resolveModifierType(const Token &token);
+
             const bool isFunctionArgument;
             std::wstring variableName;
             DataType dataType;
@@ -39,36 +45,42 @@ namespace xlang {
             bool isPointer = false;
             bool isArray = false;
             size_t arrayLength = 0;
+            bool isTemporary = false;
 
             int variableIndex = -1; // Variable index (offset) on SCOPE / module
 
 
-            bool validateVariable(std::string &result);
-
-            static std::map<std::wstring, ModifierType> modifierTypes;
-        public:
-            DataType getDataType() const;
-
-        private:
-            static std::map<std::wstring, DataType> dataTypes;
-
-            static DataType resolveDataType(const Token& token);
-            static ModifierType resolveModifierType(const Token &token);
-
+            bool validateVariable(std::wstring &result);
         public:
             explicit Variable(bool isFunctionArgument = false) : isFunctionArgument(isFunctionArgument) {}
 
+            void markTemporary();
+
             void Parse(TokenParser &parser);
+
+            ModifierType getModifierType() const;
+
+            bool getIsPointer() const;
 
             static bool isVariableType(const Token &token);
 
             static std::unique_ptr<Variable> parseFunctionArg(TokenParser &parser);
 
             const std::wstring &getVariableName() const;
-
             void setVariableIndex(int variableIndex);
 
+            void setDataType(DataType dataType);
+
             int getVariableIndex() const;
+            DataType getDataType() const;
+
+            bool supportsArithmeticOperator(const Token &token);
+
+            bool getIsTemporary() const;
+
+            void setModifierType(ModifierType modifierType);
+
+            static void setModifierTypes(const std::map<std::wstring, ModifierType> &modifierTypes);
         };
     }
 }

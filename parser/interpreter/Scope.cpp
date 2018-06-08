@@ -3,15 +3,13 @@
 //
 
 #include "Scope.h"
-#include "../compiler/instructions/CallInstruction.h"
 #include "Function.h"
 #include "Module.h"
 #include "Data.h"
-#include "../compiler/instructions/AssignInstruction.h"
-#include "../compiler/StrongTarget.h"
-#include "../compiler/WeakTarget.h"
+#include "Variable.h"
+#include "../compiler/instructions/CallInstruction.h"
 #include "../compiler/Target.h"
-
+#include "../compiler/StrongTarget.h"
 #include <cassert>
 #include <iostream>
 
@@ -21,6 +19,7 @@ namespace xlang {
         using namespace std;
         using namespace compiler;
         using namespace compiler::instructions;
+        using namespace utils;
 
         void Scope::Parse(TokenParser &parser) {
             assert(parser.getToken() == L"{");
@@ -43,9 +42,9 @@ namespace xlang {
                     parseNestedScope(parser, true);
                 } else if (Variable::isVariableType(token)) {
                     declareVariable(parser);
-                } else if (auto variable = getVariable(token)) {
+                } else if (auto variable = Container::getVariable(token)) {
                     parser.eatToken();
-                    updateVariable(parser, *variable);
+                    assignVariable(parser, *variable);
                 } else {
                     // Function call
                     parseFunctionCall(parser);
@@ -59,198 +58,56 @@ namespace xlang {
             return isRawBlock;
         }
 
-        void Scope::parseFunctionCall(TokenParser &parser) {
-            auto token = parser.getToken();
-
-            vector<const Variable *> arguments;
-            wstring moduleName;
-            wstring functionName = token.token;
-
-            token = parser.getToken();
-
-            if (token == L".") {
-                // Function name isn't function name but module name
-                moduleName = std::move(functionName);
-                token = parser.getToken();
-                functionName = token.token;
-                token = parser.getToken();
-            } else {
-                moduleName = this->getParentFunction()->getParent()->getModuleName();
-            }
-
-            if (token != L"(") {
-                parser.throwError("Expected ( after functionname");
-            }
-
-            token = parser.getToken();
-
-            while (token != L")") {
-                // Handle arguments
-
-                const Variable *argument = nullptr;
-                if (!(argument = getVariable(token))) {
-                    return parser.throwError(L"Unknown variable " + token.token);
-                }
-
-                arguments.push_back(argument);
-
-                token = parser.getToken();
-
-                // comma expected
-                if (token != L",") {
-                    break;
-                }
-
-                token = parser.getToken();
-
-            }
-            if (parser.getToken() != L";") {
-                parser.throwError("Expected ; after function call!");
-            }
-
-            auto call = unique_ptr<Instruction>((Instruction * )(new CallInstruction(
-                    unique_ptr<Target>((Target * )(new WeakTarget(moduleName, functionName))), std::move(arguments))));
-
-            instructions.emplace_back(std::move(call));
-        }
-
-        const vector<unique_ptr<Instruction>> &Scope::getInstructions() const {
-            return instructions;
-        }
-
-        const Variable *Scope::getVariable(const Token &token) const {
-
+        const Variable *Scope::getVariable(const std::wstring& name) const {
             // FIXME: Deze call is recursief. De arguments worden dus voor iedere geneste scope nog een keer uitgelezen
             if (auto parentFunction = getParentFunction()) {
                 for (auto &argument : parentFunction->getParameters()) {
-                    if (token == argument->getVariableName()) {
+                    if (name == argument->getVariableName()) {
                         return argument.get();
                     }
                 }
             }
 
-            for (auto &variable : variables) {
-                if (token == variable->getVariableName()) {
-                    return variable.get();
-                }
-            }
-
-            if (auto scope = getParentScope()) {
-                return scope->getVariable(token);
-            }
-
-            return nullptr;
+            return Container::getVariable(name);
         }
 
         void Scope::parseNestedScope(TokenParser &parser, bool isRawBlock) {
-            auto scope = make_unique<Scope>(getParentFunction(), this, isRawBlock);
+            auto scope = make_unique<Scope>(this, isRawBlock);
             scope->Parse(parser);
 
             auto call = unique_ptr<Instruction>(
                     (Instruction * )(new CallInstruction(unique_ptr<Target>(new StrongTarget(*scope)))));
-            instructions.emplace_back(std::move(call));
+            instructions.push_back(std::move(call));
 
             scopes.push_back(std::move(scope));
-        }
-
-        const wstring &Scope::getScopeId() const {
-            return scopeId;
-        }
-
-        const Function *Scope::getParentFunction() const {
-            return parentFunction;
-        }
-
-        const Scope *Scope::getParentScope() const {
-            return parentScope;
         }
 
         const vector<unique_ptr<Scope>> &Scope::getScopes() const {
             return scopes;
         }
 
-        void Scope::updateVariable(TokenParser &parser, const Variable &variable) {
-
-            auto token = parser.getToken();
-
-            if (token == L".") {
-                // Possibly accidentally declared variable with same name as module name
-                parser.throwError("Trying to access functions on variable!");
-            }
-
-            assert(token == L"=");
-
-            token = parser.getToken(true);
-
-            const Data *_data = nullptr;
-
-            if (token.isStringLiteral) {
-                _data = &upsertData(token.token);
-            } else if (auto variable = getVariable(token)) {
-                assert(false); // Not implemented!
-            }
-
-            instructions.push_back(std::make_unique<AssignInstruction>(variable, *_data));
-
-            if (parser.getToken() != L";") {
-                parser.throwError("Expected ;");
-            }
-        }
-
-        void Scope::declareVariable(TokenParser &parser) {
-            auto variable = make_unique<Variable>();
-            variable->Parse(parser);
-            variable->setVariableIndex(calculateVariableIndex());
-            variables.push_back(std::move(variable));
-
-            auto &_var = variables.back();
-            auto token = parser.peekToken();
-            if (token == L"=") {
-                // Update variable
-                updateVariable(parser, *_var);
-            } else if (token != L";") {
-                parser.throwError("Unexpected token after variable declaration!");
-            } else {
-                parser.eatToken();
-            }
-        }
-
-        const vector<unique_ptr<Variable>> &Scope::getVariables() const {
-            return variables;
-        }
-
-        template<typename T>
-        const Data &Scope::upsertData(T search) {
-            for (auto &d : data) {
-                if (*d == search) {
-                    return *d;
-                }
-            }
-
-            auto d = make_unique<Data>();
-            *d = search;
-
-            data.push_back(std::move(d));
-
-            return *data.back();
-        }
-
         unsigned int Scope::calculateVariableIndex() const {
             unsigned int index = variables.size();
 
-            if (auto parent = getParentScope()) {
+            if (auto parent = dynamic_cast<const Scope*>(getParent())) {
                 index += parent->calculateVariableIndex();
             }
 
             return index;
         }
 
-        const vector<unique_ptr<Data>> &Scope::getData() const {
-            return data;
-        }
-
         const wstring &Scope::getRawCode() const {
             return rawCode;
+        }
+
+        const Function *Scope::getParentFunction() const {
+            if (auto parent = dynamic_cast<const Function*>(getParent())) {
+                return parent;
+            } else if (auto scope = dynamic_cast<const Scope*>(getParent())) {
+                return scope->getParentFunction();
+            } else {
+                assert(false);
+            }
         }
     }
 }

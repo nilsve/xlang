@@ -7,7 +7,7 @@
 
 
 #include "Instruction.h"
-#include "../../interpreter/Variable.h"
+#include "../../interpreter/VariableLink.h"
 #include "../Target.h"
 
 #include <memory>
@@ -20,9 +20,9 @@ namespace xlang {
             class CallInstruction : public Instruction {
             private:
                 const std::unique_ptr<Target> target;
-                const std::vector<const interpreter::Variable *> parameters;
+                const std::vector<interpreter::VariableLink> parameters;
             public:
-                CallInstruction(std::unique_ptr<Target> _target, std::vector<const interpreter::Variable *> _parameters) : target(
+                CallInstruction(std::unique_ptr<Target> _target, std::vector<interpreter::VariableLink> _parameters) : target(
                         std::move(_target)), parameters(std::move(_parameters)) {}
 
                 explicit CallInstruction(std::unique_ptr<Target> _target) : target(std::move(_target)) {}
@@ -31,7 +31,7 @@ namespace xlang {
                     return target.get();
                 }
 
-                const std::vector<const interpreter::Variable *> &getParameters() const {
+                const std::vector<interpreter::VariableLink> &getParameters() const {
                     return parameters;
                 }
             };

@@ -24,11 +24,8 @@ namespace xlang {
 
         class Module;
 
-        class Function : public utils::non_copyable {
+        class Function : public Container, public utils::non_copyable {
         private:
-            const Module *parent = nullptr;
-
-            std::wstring functionName;
             CallingConvention callingConvention;
 
             std::vector<std::unique_ptr<Variable>> parameters;
@@ -43,13 +40,9 @@ namespace xlang {
             static CallingConvention getCallingConvention(const std::wstring &convention);
 
         public:
-            explicit Function(const Module *_parent) : parent(_parent) {}
+            explicit Function(const Container *_parent) : Container(L"", _parent) {}
 
-            void Parse(TokenParser &parser);
-
-            const std::wstring &getFunctionName() const;
-
-            const Module *getParent() const;
+            void Parse(TokenParser &parser) override;
 
             CallingConvention getCallingConvention() const;
 

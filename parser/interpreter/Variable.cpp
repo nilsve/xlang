@@ -45,10 +45,10 @@ namespace xlang {
                 switch (token.token[0]) {
                     case L'[':
                         //FIXME: No array support yet.
-                        parser.throwError("No array support!");
+                        parser.throwError(L"No array support!");
 
                         if (isFunctionArgument) {
-                            parser.throwError("Function argument can't be an array!");
+                            parser.throwError(L"Function argument can't be an array!");
                         }
 
                         isArray = true;
@@ -65,12 +65,12 @@ namespace xlang {
 
                             std::wstringstream ss(token.token);
                             if ((ss >> arrayLength).fail() || !(ss >> std::ws).eof()) {
-                                return parser.throwError("Expected number in array declaration!");
+                                return parser.throwError(L"Expected number in array declaration!");
                             }
 
                             token = parser.getToken();
                             if (token != L"]") {
-                                parser.throwError("Expected ] character");
+                                parser.throwError(L"Expected ] character");
                             }
                         }
                         break;
@@ -85,7 +85,7 @@ namespace xlang {
 
             variableName = token.token;
 
-            string errorMessage;
+            wstring errorMessage;
             if (validateVariable(errorMessage)) {
                 parser.throwError(errorMessage);
             }
@@ -95,9 +95,9 @@ namespace xlang {
             return variableName;
         }
 
-        bool Variable::validateVariable(std::string &result) {
+        bool Variable::validateVariable(std::wstring &result) {
             if (isArray && arrayLength == 0) {
-                result = "Array length can't be 0";
+                result = L"Array length can't be 0";
                 return true;
             }
 
@@ -136,6 +136,59 @@ namespace xlang {
 
         DataType Variable::getDataType() const {
             return dataType;
+        }
+
+        bool Variable::supportsArithmeticOperator(const Token &token) {
+            if (getIsPointer()) {
+                return true;
+            } else {
+                switch (getDataType()) {
+                    case DataType::DOUBLE:
+                    case DataType::FLOAT:
+                    case DataType::INT:
+                    case DataType::CHAR:
+                        if (token == L"+" || token == L"-" || token == L"*" || token == L"/") {
+                            return true;
+                        }
+                        break;
+                    case DataType::UNKNOWN:
+                        assert(false);
+                        break;
+                    default:
+                        return false;
+                }
+            }
+
+            return false;
+        }
+
+        void Variable::setModifierType(ModifierType modifierType) {
+            Variable::modifierType = modifierType;
+        }
+
+        bool Variable::getIsPointer() const {
+            return isPointer;
+        }
+
+        void Variable::markTemporary() {
+            isPointer = false;
+            isTemporary = true;
+        }
+
+        bool Variable::getIsTemporary() const {
+            return isTemporary;
+        }
+
+        void Variable::setDataType(DataType dataType) {
+            Variable::dataType = dataType;
+        }
+
+        ModifierType Variable::getModifierType() const {
+            return modifierType;
+        }
+
+        void Variable::setModifierTypes(const map<wstring, ModifierType> &modifierTypes) {
+            Variable::modifierTypes = modifierTypes;
         }
     }
 }

@@ -16,16 +16,16 @@ namespace xlang {
         using namespace interpreter;
 
         std::wstring StrongTarget::getModuleName() const {
-            return getFunction().getParent()->getModuleName();
+            return getFunction().getParent()->getId();
         }
 
         std::wstring StrongTarget::getFunctionName() const {
-            return getFunction().getFunctionName();
+            return getFunction().getId();
         }
 
         std::wstring StrongTarget::getScopeId() const {
             if (type == StrongTargetType::SCOPE) {
-                return target.scope->getScopeId();
+                return target.scope->getId();
             }
             return L"";
         }
@@ -58,7 +58,7 @@ namespace xlang {
         }
 
         std::wstring StrongTarget::getPath(const Scope *scope) const {
-            std::wstring result = scope->getScopeId();
+            std::wstring result = scope->getId();
             if (auto function = scope->getParentFunction()) {
                 result = getPath(function) + L"_" + result;
             }
@@ -67,9 +67,9 @@ namespace xlang {
         }
 
         std::wstring StrongTarget::getPath(const Function *function) const {
-            std::wstring result = function->getFunctionName();
+            std::wstring result = function->getId();
             if (auto module = function->getParent()) {
-                result = module->getModuleName() + L"_" + result;
+                result = module->getId() + L"_" + result;
             }
 
             return result;

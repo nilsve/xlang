@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <gtkmm-3.0/gtkmm.h>
 
 using namespace xlang;
 using namespace xlang::interpreter;
@@ -13,11 +14,23 @@ using namespace xlang::compiler::assemblers;
 
 using namespace std;
 
-int main() {
+int main(int argc, char *argv[]) {
+
+    /*auto app =
+            Gtk::Application::create(argc, argv,
+                                     "org.gtkmm.examples.base");
+
+    Gtk::Window window;
+    window.set_default_size(200, 200);
+
+    Gtk::Button button("few", true);
+    window.add(button);
+
+    return app->run(window);*/
 
     srand(0); // Predictable scope names etc
 
-    Parser parser(L"/Users/nilsvaneijk/Desktop/test/", L"main.x");
+    Parser parser(L"/Users/nils.van.eijk/Desktop/test/", L"main.x");
     parser.Parse();
 
     Compiler<NasmX86Assembler> compiler(parser);

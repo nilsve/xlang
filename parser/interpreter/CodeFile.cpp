@@ -63,7 +63,7 @@ namespace xlang {
             if (token == L"include") {
                 const Token fileToken = parser.getToken(true);
                 if (!fileToken.isStringLiteral) {
-                    parser.throwError("Expected a string literal after #include");
+                    parser.throwError(L"Expected a string literal after #include");
                 } else {
                     // Fix import
                     auto &codeFile = this->parser.loadFile(fileToken.token);

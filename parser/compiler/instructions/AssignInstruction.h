@@ -13,28 +13,46 @@ namespace xlang {
     namespace compiler {
         namespace instructions {
 
+            enum class ArithmeticType {
+                ASSIGN,
+                DIVIDE,
+                MULTIPLY,
+                SUBSTRACT,
+                ADD,
+            };
+
+
+
             class AssignInstruction : public Instruction {
             private:
-                const interpreter::Variable *target;
-                const interpreter::Data *data;
+                const interpreter::Variable *target = nullptr;
+                const interpreter::Data *data = nullptr;
+                const interpreter::Variable *sourceVariable = nullptr;
+
+                ArithmeticType arithmeticOperation = ArithmeticType::ASSIGN;
 
             public:
                 AssignInstruction(const interpreter::Variable &_target, const interpreter::Data &_data) : target(&_target), data(&_data) {}
+                AssignInstruction(const interpreter::Variable &_target, const interpreter::Variable &_sourceVariable) : target(&_target), sourceVariable(&_sourceVariable) {}
 
                 const interpreter::Variable *getTarget() const {
                     return target;
                 }
 
-                void setTarget(const interpreter::Variable *target) {
-                    AssignInstruction::target = target;
+                ArithmeticType getArithmeticOperation() const {
+                    return arithmeticOperation;
+                }
+
+                void setArithmeticOperation(ArithmeticType arithmeticOperation) {
+                    AssignInstruction::arithmeticOperation = arithmeticOperation;
                 }
 
                 const interpreter::Data *getData() const {
                     return data;
                 }
 
-                void setData(const interpreter::Data *data) {
-                    AssignInstruction::data = data;
+                const interpreter::Variable *getSourceVariable() const {
+                    return sourceVariable;
                 }
             };
         }

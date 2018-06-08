@@ -24,14 +24,17 @@ namespace xlang {
         private:
             static unsigned long highestDataId;
             const std::wstring dataId;
+            const bool isNumber = false;
             std::vector<unsigned char> data;
 
             static std::wstring getUniqueDataId();
 
         public:
-            Data() : dataId(Data::getUniqueDataId()) {}
+            Data(bool _isNumber) : dataId(Data::getUniqueDataId()), isNumber(_isNumber) {}
 
             Data &operator=(const std::wstring &str);
+
+            bool getIsNumber() const;
 
             template<typename T>
             bool operator==(const T &other) const {
@@ -48,8 +51,9 @@ namespace xlang {
                 return true;
             }
 
-            bool operator==(const Data &other) const;
+            std::wstring getDataAsString() const;
 
+            bool operator==(const Data &other) const;
             bool operator!=(const Data &other) const;
 
             const std::vector<unsigned char> &getData() const;

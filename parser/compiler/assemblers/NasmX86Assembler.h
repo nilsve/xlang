@@ -8,12 +8,16 @@
 #include "AssemblerBase.h"
 #include "../../interpreter/Function.h"
 #include "../../interpreter/Module.h"
+#include "../instructions/AssignInstruction.h"
 
 namespace xlang {
     namespace compiler {
         namespace assemblers {
 
             class NasmX86Assembler : public AssemblerBase {
+            private:
+                std::wstring assembleAssignInstruction(const xlang::compiler::instructions::AssignInstruction &instruction) const;
+
             public:
                 std::wstring assembleInstruction(const compiler::instructions::Instruction &instruction) const override;
 
