@@ -30,7 +30,7 @@ namespace xlang {
 
                 virtual std::wstring assembleScopeStart(const interpreter::Scope &scope) const {
                     return scope.getParentFunction()->getParent()->getId() + L"_" +
-                           scope.getParentFunction()->getId() + L"_" + scope.getId();
+                           scope.getParentFunction()->getId() + L"_" + scope.getId() + L":";
                 };
             };
         }

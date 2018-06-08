@@ -34,10 +34,13 @@ namespace xlang {
 
                     wstring result;
 
-                    for (auto &parameter : callInstruction->getParameters()) {
-                        result += L"push DWORD [ebp + " + to_wstring(parameter.variable.getVariableIndex()) + L"]\n";
-                    }
-
+					auto& parameters = callInstruction->getParameters();
+					if (parameters.size()) {
+						for (int i = parameters.size() - 1; i >= 0; i--) {
+							auto& parameter = parameters[i];
+							result += L"push DWORD [ebp - " + std::to_wstring(getVariableIndex(parameter.variable.getVariableIndex()) * REGISTER_SIZE) + L"]\n";
+						}
+					}
                     return result + L"call " + callInstruction->getTarget()->getFullPath();
                 } else if (auto assignInstruction = dynamic_cast<const compiler::instructions::AssignInstruction *>(&instruction)) {
                     return assembleAssignInstruction(*assignInstruction);
@@ -56,15 +59,15 @@ namespace xlang {
 
                     if (auto data = assignInstruction.getData()) {
                         if (data->getIsNumber()) {
-                            result += L"mov DWORD [ebp + " + to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], " + data->getDataAsString();
+                            result += L"mov DWORD [ebp - " + to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE ) + L"], " + data->getDataAsString();
                         } else {
-                            result +=  L"mov DWORD eax, " + data->getDataId() + L"\n";
-                                     L"mov DWORD [ebp + " + to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
+                            result +=  L"mov DWORD eax, " + data->getDataId() + L"\n"
+                                     L"mov DWORD [ebp - " + to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
                         }
 
                     } else if (auto sourceVariable = assignInstruction.getSourceVariable()) {
-                        result += L"mov DWORD eax, [ebp + " + to_wstring(getVariableIndex(sourceVariable->getVariableIndex()) * REGISTER_SIZE) + L"]\n"
-                               L"mov DWORD [ebp + " + to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
+                        result += L"mov DWORD eax, [ebp - " + to_wstring(getVariableIndex(sourceVariable->getVariableIndex()) * REGISTER_SIZE) + L"]\n"
+                               L"mov DWORD [ebp - " + to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
                     } else {
                         assert(false);
                     }
