@@ -1,6 +1,6 @@
 #include "parser/interpreter/CodeFile.h"
 #include "parser/interpreter/Parser.h"
-#include "parser/compiler/assemblers/NasmX86Assembler.h"
+#include "parser/compiler/assemblers/x86/NasmX86Assembler.h"
 #include "parser/compiler/Compiler.h"
 
 #include <iostream>

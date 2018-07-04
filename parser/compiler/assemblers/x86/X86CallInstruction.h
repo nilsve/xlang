@@ -7,11 +7,11 @@
 
 #include "../../instructions/CallInstruction.h"
 #include "../InstructionAssembler.h"
-#include "../NasmX86Assembler.h"
+#include "NasmX86Assembler.h"
 
 #include <string>
 
-namespace xlang::compiler::assemblers::x86_instructions {
+namespace xlang::compiler::assemblers::x86 {
     class X86CallInstruction: public InstructionAssembler<instructions::CallInstruction> {
     public:
         X86CallInstruction(const AssemblerBase &base) : InstructionAssembler(base) {}

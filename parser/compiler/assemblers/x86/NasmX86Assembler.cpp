@@ -3,12 +3,12 @@
 //
 
 #include "NasmX86Assembler.h"
-#include "../instructions/JmpInstruction.h"
-#include "../instructions/CallInstruction.h"
-#include "../../interpreter/Variable.h"
+#include "../../instructions/JmpInstruction.h"
+#include "../../instructions/CallInstruction.h"
+#include "../../../interpreter/Variable.h"
 
-#include "x86_instructions/X86AssignInstruction.h"
-#include "x86_instructions/X86CallInstruction.h"
+#include "X86AssignInstruction.h"
+#include "X86CallInstruction.h"
 
 #include <iostream>
 #include <cassert>
@@ -20,7 +20,7 @@ namespace xlang {
         namespace assemblers {
 
             using namespace std;
-            using namespace x86_instructions;
+            using namespace x86;
 
             int NasmX86Assembler::getVariableIndex(int variableIndex) const {
                 if (variableIndex >= 0) {

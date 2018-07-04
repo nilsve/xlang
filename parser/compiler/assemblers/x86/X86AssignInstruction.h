@@ -10,7 +10,7 @@
 
 #include <string>
 
-namespace xlang::compiler::assemblers::x86_instructions {
+namespace xlang::compiler::assemblers::x86 {
     class X86AssignInstruction : public InstructionAssembler<instructions::AssignInstruction> {
     public:
         X86AssignInstruction(const AssemblerBase &base) : InstructionAssembler(base) {}

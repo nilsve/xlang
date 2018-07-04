@@ -5,13 +5,13 @@
 #ifndef XLANG_NasmX86Assembler_H
 #define XLANG_NasmX86Assembler_H
 
-#include "AssemblerBase.h"
-#include "../../interpreter/Function.h"
-#include "../../interpreter/Module.h"
+#include "../AssemblerBase.h"
+#include "../../../interpreter/Function.h"
+#include "../../../interpreter/Module.h"
 
-#include "./x86_instructions/X86AssignInstruction.h"
-#include "./x86_instructions/X86CallInstruction.h"
-#include "./x86_instructions/X86JmpInstruction.h"
+#include "X86AssignInstruction.h"
+#include "X86CallInstruction.h"
+#include "X86JmpInstruction.h"
 
 #include <memory>
 
@@ -20,14 +20,14 @@ namespace xlang {
         namespace assemblers {
             class NasmX86Assembler : public AssemblerBase {
             private:
-                std::unique_ptr<x86_instructions::X86AssignInstruction> assignInstructionAssembler;
-                std::unique_ptr<x86_instructions::X86CallInstruction> callInstructionAssembler;
-                std::unique_ptr<x86_instructions::X86JmpInstruction> jmpInstructionAssembler;
+                std::unique_ptr<x86::X86AssignInstruction> assignInstructionAssembler;
+                std::unique_ptr<x86::X86CallInstruction> callInstructionAssembler;
+                std::unique_ptr<x86::X86JmpInstruction> jmpInstructionAssembler;
             public:
                 NasmX86Assembler() {
-                    assignInstructionAssembler = std::make_unique<x86_instructions::X86AssignInstruction>(*this);
-                    callInstructionAssembler= std::make_unique<x86_instructions::X86CallInstruction>(*this);
-                    jmpInstructionAssembler= std::make_unique<x86_instructions::X86JmpInstruction>(*this);
+                    assignInstructionAssembler = std::make_unique<x86::X86AssignInstruction>(*this);
+                    callInstructionAssembler= std::make_unique<x86::X86CallInstruction>(*this);
+                    jmpInstructionAssembler= std::make_unique<x86::X86JmpInstruction>(*this);
                 };
 
                 long getRegisterSize() const override;

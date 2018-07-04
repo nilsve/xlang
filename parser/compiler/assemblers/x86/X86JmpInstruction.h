@@ -7,11 +7,11 @@
 
 #include "../../instructions/JmpInstruction.h"
 #include "../InstructionAssembler.h"
-#include "../NasmX86Assembler.h"
+#include "NasmX86Assembler.h"
 
 #include <string>
 
-namespace xlang::compiler::assemblers::x86_instructions {
+namespace xlang::compiler::assemblers::x86 {
     class X86JmpInstruction: public InstructionAssembler<instructions::JmpInstruction> {
     public:
         X86JmpInstruction(const AssemblerBase &base) : InstructionAssembler(base) {}
