@@ -8,20 +8,22 @@
 #include <memory>
 #include <cassert>
 
+#include <iostream>
+
 using namespace std;
 
 namespace xlang {
     namespace interpreter {
 
         void Module::Parse(TokenParser &parser) {
-            assert(parser.getToken() == L"module");
+            parser.debugAssertNext(L"module");
 
             auto moduleName = parser.getToken(true);
-
             this->id = moduleName.token;
 
-            if (parser.getToken() != L"{") {
-                parser.throwError(L"Expected { after module name");
+            auto bla = parser.getToken();
+            if (bla != L"{") {
+                parser.throwError(L"Expected { after module name, got " + bla.token);
             }
 
             while (true) {

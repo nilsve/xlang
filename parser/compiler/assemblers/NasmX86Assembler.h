@@ -8,17 +8,31 @@
 #include "AssemblerBase.h"
 #include "../../interpreter/Function.h"
 #include "../../interpreter/Module.h"
-#include "../instructions/AssignInstruction.h"
+
+#include "./x86_instructions/X86AssignInstruction.h"
+#include "./x86_instructions/X86CallInstruction.h"
+#include "./x86_instructions/X86JmpInstruction.h"
+
+#include <memory>
 
 namespace xlang {
     namespace compiler {
         namespace assemblers {
-
             class NasmX86Assembler : public AssemblerBase {
             private:
-                std::wstring assembleAssignInstruction(const xlang::compiler::instructions::AssignInstruction &instruction) const;
-
+                std::unique_ptr<x86_instructions::X86AssignInstruction> assignInstructionAssembler;
+                std::unique_ptr<x86_instructions::X86CallInstruction> callInstructionAssembler;
+                std::unique_ptr<x86_instructions::X86JmpInstruction> jmpInstructionAssembler;
             public:
+                NasmX86Assembler() {
+                    assignInstructionAssembler = std::make_unique<x86_instructions::X86AssignInstruction>(*this);
+                    callInstructionAssembler= std::make_unique<x86_instructions::X86CallInstruction>(*this);
+                    jmpInstructionAssembler= std::make_unique<x86_instructions::X86JmpInstruction>(*this);
+                };
+
+                long getRegisterSize() const override;
+
+                int getVariableIndex(int variableIndex) const override;
                 std::wstring assembleInstruction(const compiler::instructions::Instruction &instruction) const override;
 
                 std::wstring assembleFunctionStart(const interpreter::Function &function) const override;

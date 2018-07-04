@@ -17,7 +17,7 @@ namespace xlang {
         }
 
         void Function::parseHeader(TokenParser &parser) {
-            assert(parser.getToken() == L"function");
+            parser.debugAssertNext(L"function");
 
             auto functionName = parser.getToken();
             this->id = functionName.token;

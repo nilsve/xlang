@@ -93,8 +93,8 @@ namespace xlang {
         }
 
         bool TokenParser::isSpecialChar(wchar_t chr) {
-            // _ char is allowed
-            return !((chr == L'_') || (chr >= L'a' && chr <= L'z') || (chr >= L'A' && chr <= L'Z') || (chr >= L'0' && chr <= L'9'));
+            // '_' & '$' chars are allowed
+            return !((chr == L'_') || (chr == L'$') || (chr >= L'a' && chr <= L'z') || (chr >= L'A' && chr <= L'Z') || (chr >= L'0' && chr <= L'9'));
         }
 
         wchar_t TokenParser::getStringLiteral(wchar_t chr) {

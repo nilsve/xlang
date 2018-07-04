@@ -14,8 +14,11 @@ namespace xlang {
     namespace compiler {
         namespace assemblers {
 
-            class AssemblerBase {
+            class AssemblerBase : public utils::non_copyable{
             public:
+                virtual long getRegisterSize() const = 0;
+                virtual int getVariableIndex(int variableIndex) const = 0;
+
                 virtual std::wstring assembleInstruction(const compiler::instructions::Instruction &instruction) const = 0;
 
                 virtual std::wstring assembleFunctionEnd(const interpreter::Function &function) const = 0;

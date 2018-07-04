@@ -10,6 +10,7 @@
 
 #include <string>
 #include <set>
+#include <cassert>
 
 namespace xlang {
     namespace interpreter {
@@ -51,6 +52,15 @@ namespace xlang {
 
             void eatToken();
 
+#ifndef NDEBUG
+            void debugAssertNext(const std::wstring& expectedToken) {
+                assert(getToken(false) == expectedToken);
+            }
+#else
+            void debugAssertNext(const std::wstring& expectedToken) {
+                eatToken();
+            }
+#endif
         };
     }
 }

@@ -22,10 +22,9 @@ namespace xlang {
         using namespace utils;
 
         void Scope::Parse(TokenParser &parser) {
-            assert(parser.getToken() == L"{");
+            parser.debugAssertNext(L"{");
 
             if (getIsRawBlock()) {
-                // Read untill } character
                 rawCode = parser.readUntill(L'}');
             }
 

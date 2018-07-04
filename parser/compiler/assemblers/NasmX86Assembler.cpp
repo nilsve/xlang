@@ -3,10 +3,12 @@
 //
 
 #include "NasmX86Assembler.h"
-#include "../instructions/CallInstruction.h"
-#include "../instructions/AssignInstruction.h"
 #include "../instructions/JmpInstruction.h"
+#include "../instructions/CallInstruction.h"
 #include "../../interpreter/Variable.h"
+
+#include "x86_instructions/X86AssignInstruction.h"
+#include "x86_instructions/X86CallInstruction.h"
 
 #include <iostream>
 #include <cassert>
@@ -18,10 +20,9 @@ namespace xlang {
         namespace assemblers {
 
             using namespace std;
+            using namespace x86_instructions;
 
-            const long REGISTER_SIZE = 4;
-
-            int getVariableIndex(int variableIndex) {
+            int NasmX86Assembler::getVariableIndex(int variableIndex) const {
                 if (variableIndex >= 0) {
                     return variableIndex;
                 } else {
@@ -30,65 +31,29 @@ namespace xlang {
             }
 
             wstring NasmX86Assembler::assembleInstruction(const compiler::instructions::Instruction &instruction) const {
-                if (auto callInstruction = dynamic_cast<const compiler::instructions::CallInstruction *>(&instruction)) {
 
-                    wstring result;
-
-					auto& parameters = callInstruction->getParameters();
-					if (parameters.size()) {
-						for (int i = parameters.size() - 1; i >= 0; i--) {
-							auto& parameter = parameters[i];
-							result += L"push DWORD [ebp - " + std::to_wstring(getVariableIndex(parameter.variable.getVariableIndex()) * REGISTER_SIZE) + L"]\n";
-						}
-					}
-                    return result + L"call " + callInstruction->getTarget()->getFullPath();
-                } else if (auto assignInstruction = dynamic_cast<const compiler::instructions::AssignInstruction *>(&instruction)) {
-                    return assembleAssignInstruction(*assignInstruction);
-                } else if (auto jmpInstruction = dynamic_cast<const compiler::instructions::JmpInstruction *>(&instruction)) {
-                    return L"jmp " + jmpInstruction->getTarget()->getFullPath();
+                if (X86AssignInstruction::isType(&instruction)) {
+                    return assignInstructionAssembler->Assemble(*dynamic_cast<const instructions::AssignInstruction*>(&instruction));
+                } else if (X86CallInstruction::isType(&instruction)) {
+                    return callInstructionAssembler->Assemble(*dynamic_cast<const instructions::CallInstruction*>(&instruction));
+                } else if (X86JmpInstruction::isType(&instruction)) {
+                    return jmpInstructionAssembler->Assemble(*dynamic_cast<const instructions::JmpInstruction*>(&instruction));
                 }
 
                 throw invalid_argument("Instruction not implemented!");
-            }
-
-            wstring NasmX86Assembler::assembleAssignInstruction(const instructions::AssignInstruction &assignInstruction) const {
-                wstring result;
-                if (auto target = assignInstruction.getTarget()) {
-
-                    wstring source;
-
-                    if (auto data = assignInstruction.getData()) {
-                        if (data->getIsNumber()) {
-                            result += L"mov DWORD [ebp - " + to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE ) + L"], " + data->getDataAsString();
-                        } else {
-                            result +=  L"mov DWORD eax, " + data->getDataId() + L"\n"
-                                     L"mov DWORD [ebp - " + to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
-                        }
-
-                    } else if (auto sourceVariable = assignInstruction.getSourceVariable()) {
-                        result += L"mov DWORD eax, [ebp - " + to_wstring(getVariableIndex(sourceVariable->getVariableIndex()) * REGISTER_SIZE) + L"]\n"
-                               L"mov DWORD [ebp - " + to_wstring(getVariableIndex(target->getVariableIndex()) * REGISTER_SIZE) + L"], eax";
-                    } else {
-                        assert(false);
-                    }
-                } else {
-                    utils::Utils::throwError("Target empty for assignment instruction!");
-                }
-
-                return result;
             }
 
             wstring NasmX86Assembler::assembleFunctionEnd(const interpreter::Function &function) const {
                 return L"mov esp, ebp\n"
                        L"pop ebp\n"
                        L"ret " + (function.getCallingConvention() == interpreter::CallingConvention::CDECL ? to_wstring(
-                        function.getParameters().size() * REGISTER_SIZE) : L"");
+                        function.getParameters().size() * getRegisterSize()) : L"");
             }
 
             wstring NasmX86Assembler::assembleScopeStart(const interpreter::Scope &scope) const {
                 auto result = AssemblerBase::assembleScopeStart(scope);
 
-                unsigned int scopeReservation = scope.getVariables().size() * REGISTER_SIZE;
+                auto scopeReservation = scope.getVariables().size() * getRegisterSize();
                 if (scopeReservation > 0) {
                     result += L"\n"
                               L"sub esp, " + to_wstring(scopeReservation);
@@ -108,7 +73,7 @@ namespace xlang {
             wstring NasmX86Assembler::assembleScopeEnd(const interpreter::Scope &scope) const {
                 wstring result = L"ret";
 
-                unsigned int scopeReservation = scope.getVariables().size() * REGISTER_SIZE;
+                auto scopeReservation = scope.getVariables().size() * getRegisterSize();
                 if (scopeReservation > 0) {
                     result = L"add esp, " + to_wstring(scopeReservation) + L"\n" + result;
                 }
@@ -126,6 +91,10 @@ namespace xlang {
 
                 stream << L"0x0";
                 return stream.str();
+            }
+
+            long NasmX86Assembler::getRegisterSize() const {
+                return 4;
             }
         }
     }

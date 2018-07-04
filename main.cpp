@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 
     Compiler<NasmX86Assembler> compiler(parser);
     compiler.setDataStorageMode(DataStorageMode::SCOPE);
-    
+
     auto translated = compiler.Compile();
     wcout << translated;
 
@@ -43,7 +43,6 @@ int main(int argc, char *argv[]) {
     out << L"section .text" << endl << L"global start" << endl << L"start:" << endl << endl;
     out.write(translated.c_str(), translated.size());
     out.close();
-
 
     return 0;
 }
